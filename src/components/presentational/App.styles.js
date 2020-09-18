@@ -37,7 +37,7 @@ const UI = styled.section`
     }
     
     @media only screen and (orientation:portrait){
-      transform: translate(-15px,calc(100vh - 217px));
+      transform: translate(-15px,calc(100vh - 270px));
     }
   }
 
