@@ -17,7 +17,6 @@
     "react-scripts": "3.4.3",
     "react-spring": "^8.0.27",
     "react-three-fiber": "^4.2.20",
-    "react-use-gesture": "^7.0.16",
     "styled-components": "^5.1.1",
     "three": "^0.119.1",
     "use-cannon": "^0.5.1"
