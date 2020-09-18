@@ -1,12 +1,15 @@
 import { HTML } from 'drei';
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSpring } from 'react-spring';
 import { useFrame } from 'react-three-fiber';
 import { updateScene } from '../../features/scene';
 import * as S from '../presentational/App.styles';
 
+const showTips = localStorage.getItem('tips');
+
 const Menu = () => {
+  const [tips, setTips] = useState(showTips);
   const [{ mouseX }, setSpring] = useSpring(() => ({
     mouseX: 0,
   }));
@@ -26,9 +29,24 @@ const Menu = () => {
     dispatch(updateScene(+e.target.dataset.scene));
   };
 
+  const hideTips = () => {
+    localStorage.setItem('tips', true);
+    setTips(true);
+  };
+
   return (
     <HTML>
       <S.UI>
+        {!tips
+        && (
+        <div className="info" onPointerDown={hideTips}>
+          <span>rigthClick | 2 fingers = span</span>
+          <span>scroll | pinch = zoom</span>
+          <span>click things around, they do stuff :0</span>
+          <br />
+          <span>Click me to hide</span>
+        </div>
+        )}
         <S.Menu>
           <li>
             <S.Button data-scene={1} type="button" style={followMouse} title="Home" onClick={handleClick}>

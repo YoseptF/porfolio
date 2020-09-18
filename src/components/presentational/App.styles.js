@@ -18,6 +18,29 @@ const UI = styled.section`
   flex-direction: column;
   align-items:center;
   justify-content: center;
+  position: relative;
+  .info {
+    cursor: pointer;
+    color: white;
+    border-radius: 11px;
+    border: 2px solid red;
+    transform: translate(330px, 30px);
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    span{
+      display: block;
+      min-width: 260px;
+    }
+    
+    @media only screen and (orientation:portrait){
+      transform: translate(-15px,calc(100vh - 140px));
+    }
+  }
+
   @media only screen and (orientation: portrait){
     flex-direction: row;
     height: 70px;
