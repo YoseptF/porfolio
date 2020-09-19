@@ -59,7 +59,7 @@ const Menu = () => {
             </S.Button>
           </li>
           <li>
-            <S.Button data-scene={3} type="button" style={followMouse} title="Portfolio" onClick={handleClick}>
+            <S.Button data-scene={3} type="button" style={followMouse} title="Contact" onClick={handleClick}>
               <i className="fas fa-envelope-open" data-scene={3} />
             </S.Button>
           </li>
