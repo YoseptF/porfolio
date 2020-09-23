@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as THREE from 'three';
 import { useLoader } from 'react-three-fiber';
 import { useBox } from 'use-cannon';
@@ -22,22 +22,34 @@ const Card = ({
     ],
   }));
 
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsReady(true);
+    }, 1500);
+  }, []);
+
   const handleClick = e => {
-    const [{ type }, { 'data-link': dataLink, className = '' }] = Object.values(e.target);
-    if (className.includes('cardI')) window.open(dataLink, '_blank');
-    if (type === 'canvas') {
-      api.velocity.set(0, 0, 25);
-      api.angularVelocity.set(0, 0, (Math.random() * 2) - 1);
-      setActive(!active);
+    if (isReady) {
+      const [{ type }, { 'data-link': dataLink, className = '' }] = Object.values(e.target);
+      if (className.includes('cardI')) window.open(dataLink, '_blank');
+      if (type === 'canvas') {
+        api.velocity.set(0, 0, 25);
+        api.angularVelocity.set(0, 0, (Math.random() * 2) - 1);
+        setActive(!active);
+      }
     }
   };
 
   const shake = () => {
-    api.velocity.set(0, 0, 7);
-    api.angularVelocity.set((
-      Math.random() * 1) - 0.5,
-    (Math.random() * 1) - 0.5,
-    0);
+    if (isReady) {
+      api.velocity.set(0, 0, 7);
+      api.angularVelocity.set((
+        Math.random() * 1) - 0.5,
+      (Math.random() * 1) - 0.5,
+      0);
+    }
   };
 
   return (
