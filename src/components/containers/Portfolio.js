@@ -36,10 +36,10 @@ const Portfolio = () => (
     />
     <Card
       position={[70, 80, 0]}
-      texture="animal"
+      texture="chatto"
       double
-      demo="https://acnh-catalog.herokuapp.com/"
-      github="https://github.com/YoseptF/acnh-catalog"
+      demo="https://michato.netlify.app"
+      github="https://github.com/YoseptF/Chato"
     />
     <Card
       position={[60, 40, 0]}
