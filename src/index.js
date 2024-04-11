@@ -45,7 +45,7 @@ fetch('https://api.ipify.org?format=json')
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        message: `Someone just saw your page!${JSON.stringify(visitorData)}`,
+        message: `Someone just saw your cv page!${JSON.stringify(visitorData)}`,
       }),
     });
   });
@@ -63,10 +63,13 @@ ReactDOM.render(
         justifyContent: 'center',
       }}
     >
-      <img
-        className="animate__animated animate__infinite animate__bounce"
-        src="/cards/call.png"
-        alt="logo"
+      <iframe
+        src="https://drive.google.com/file/d/1PFqGwRHe3hmwSoGd22DHGqaux1psafHD/preview"
+        allow="autoplay"
+        style={{
+          height: '100vh',
+          width: '100vw',
+        }}
       />
     </div>
   </React.StrictMode>,
