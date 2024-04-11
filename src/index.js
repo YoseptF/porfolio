@@ -66,6 +66,7 @@ ReactDOM.render(
       <iframe
         src="https://drive.google.com/file/d/1PFqGwRHe3hmwSoGd22DHGqaux1psafHD/preview"
         allow="autoplay"
+        title='cv'
         style={{
           height: '100vh',
           width: '100vw',
