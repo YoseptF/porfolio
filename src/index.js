@@ -45,7 +45,7 @@ fetch('https://api.ipify.org?format=json')
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        message: `Someone just saw your cv page!!!${JSON.stringify(visitorData)}`,
+        message: `Someone just saw your cv page!${JSON.stringify(visitorData)}`,
       }),
     });
   });
