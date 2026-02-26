@@ -25,10 +25,11 @@ export const FeltBackground: FC<FeltBackgroundProps> = ({
   )
 
   useFrame((_state, delta) => {
-    if (materialRef.current) {
-      materialRef.current.uniforms.uTime.value += delta
-      materialRef.current.uniforms.uResolution.value.set(size.width, size.height)
-    }
+    const mat = materialRef.current
+    if (!mat) return
+    const u = mat.uniforms
+    if (u.uTime) u.uTime.value += delta
+    if (u.uResolution) u.uResolution.value.set(size.width, size.height)
   })
 
   return (
