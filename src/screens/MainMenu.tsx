@@ -3,7 +3,6 @@ import styled from 'styled-components'
 import { Canvas } from '@react-three/fiber'
 import { BalatroBackground } from '../components/three/BalatroBackground'
 import { BalatroButton } from '../components/ui/BalatroButton'
-import { BalatroText } from '../components/ui/BalatroText'
 import { useAppDispatch } from '../store/hooks'
 import { navigateTo, openModal } from '../store/slices/navigation'
 import { theme } from '../styles/theme'
@@ -17,64 +16,62 @@ const randomCard = () => {
 
 const cardTexture = randomCard()
 
-const isTouchDevice = () =>
-  typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0)
-
 const Wrapper = styled.div`
   position: absolute;
   inset: 0;
 `
 
-const CenterContent = styled.div`
+const TitleCardArea = styled.div`
   position: absolute;
-  inset: 0;
-  bottom: 100px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 12vh;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   pointer-events: none;
   z-index: 1;
+`
 
-  @media (max-width: 600px) {
-    bottom: 80px;
-  }
+const TitleCardWrapper = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `
 
 const TitleLogo = styled.img`
-  width: 55vw;
-  max-width: 800px;
+  width: 75vw;
+  max-width: 1100px;
   height: auto;
 
   @media (max-width: 600px) {
-    width: 80vw;
+    width: 90vw;
   }
 `
 
-const Subtitle = styled.div`
-  margin-top: 8px;
-  margin-bottom: 0;
-`
-
 const CardImage = styled.img`
-  width: 280px;
+  position: absolute;
+  width: 13vw;
+  min-width: 120px;
+  max-width: 200px;
   height: auto;
   border-radius: 8px;
   border: 3px solid rgba(255, 255, 255, 0.3);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
-  margin-top: -10px;
   pointer-events: auto;
-  position: relative;
   z-index: 2;
+  cursor: grab;
+  touch-action: none;
 
-  @media (max-width: 600px) {
-    width: 160px;
-    animation: bob 3s ease-in-out infinite;
+  &:active {
+    cursor: grabbing;
   }
 
-  @keyframes bob {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+  @media (max-width: 600px) {
+    width: 25vw;
+    min-width: 80px;
   }
 `
 
@@ -83,33 +80,38 @@ const ButtonBar = styled.div`
   bottom: 0;
   left: 0;
   right: 0;
+  height: 12vh;
+  min-height: 70px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  padding: 18px 24px;
-  background: rgba(0, 0, 0, 0.35);
+  padding: 0 3vw;
+  background: rgba(0, 0, 0, 0.45);
   pointer-events: auto;
   z-index: 2;
 
   @media (max-width: 600px) {
-    padding: 10px 8px;
+    height: 10vh;
+    padding: 0 8px;
     gap: 6px;
-    flex-wrap: wrap;
   }
 `
 
 const MenuButton = styled(BalatroButton)`
   flex: 1;
-  max-width: 240px;
-  min-width: 120px;
-  padding: 18px 0;
-  font-size: 1.8rem;
+  max-width: 280px;
+  height: 8vh;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-size: 2.2rem;
 
   @media (max-width: 600px) {
-    min-width: 0;
-    padding: 12px 0;
     font-size: 1.2rem;
+    height: 7vh;
   }
 `
 
@@ -139,44 +141,22 @@ const SocialLinks = styled.div`
 export const MainMenu: FC = () => {
   const dispatch = useAppDispatch()
   const cardRef = useRef<HTMLImageElement>(null)
-  const tiltRef = useRef({ x: 0, y: 0 })
   const animFrame = useRef(0)
   const startTime = useRef(0)
-
-  const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-    if (isTouchDevice() || !cardRef.current) return
-
-    const rect = cardRef.current.getBoundingClientRect()
-    const cardCenterX = rect.left + rect.width / 2
-    const cardCenterY = rect.top + rect.height / 2
-
-    const maxTilt = 15
-    const distX = (e.clientX - cardCenterX) / (window.innerWidth / 2)
-    const distY = (e.clientY - cardCenterY) / (window.innerHeight / 2)
-
-    tiltRef.current = {
-      x: Math.max(-maxTilt, Math.min(maxTilt, distX * maxTilt)),
-      y: Math.max(-maxTilt, Math.min(maxTilt, -distY * maxTilt)),
-    }
-  }, [])
-
-  const handlePointerLeave = useCallback(() => {
-    tiltRef.current = { x: 0, y: 0 }
-  }, [])
+  const dragState = useRef({ dragging: false, offsetX: 0, offsetY: 0, x: 0, y: 0 })
 
   useEffect(() => {
-    if (isTouchDevice()) return
-
     startTime.current = Date.now()
 
     const animate = () => {
       const elapsed = (Date.now() - startTime.current) / 1000
-      const bobY = Math.sin(elapsed * 2) * 10
-      const { x, y } = tiltRef.current
+      const jiggleAngle = Math.sin(elapsed * 3) * 4
+      const bobY = Math.sin(elapsed * 2) * 6
+      const { x, y } = dragState.current
 
       if (cardRef.current) {
         cardRef.current.style.transform =
-          `perspective(800px) rotateY(${x}deg) rotateX(${y}deg) translateY(${bobY}px)`
+          `translate(${x}px, ${y + bobY}px) rotate(${jiggleAngle}deg)`
       }
 
       animFrame.current = requestAnimationFrame(animate)
@@ -186,8 +166,37 @@ export const MainMenu: FC = () => {
     return () => cancelAnimationFrame(animFrame.current)
   }, [])
 
+  const handleCardPointerDown = useCallback((e: React.PointerEvent<HTMLImageElement>) => {
+    e.preventDefault()
+    const card = cardRef.current
+    if (!card) return
+
+    card.setPointerCapture(e.pointerId)
+    const rect = card.getBoundingClientRect()
+    dragState.current.dragging = true
+    dragState.current.offsetX = e.clientX - rect.left - rect.width / 2 - dragState.current.x
+    dragState.current.offsetY = e.clientY - rect.top - rect.height / 2 - dragState.current.y
+  }, [])
+
+  const handleCardPointerMove = useCallback((e: React.PointerEvent<HTMLImageElement>) => {
+    if (!dragState.current.dragging || !cardRef.current) return
+
+    const rect = cardRef.current.parentElement?.getBoundingClientRect()
+    if (!rect) return
+
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+
+    dragState.current.x = e.clientX - centerX - dragState.current.offsetX
+    dragState.current.y = e.clientY - centerY - dragState.current.offsetY
+  }, [])
+
+  const handleCardPointerUp = useCallback(() => {
+    dragState.current.dragging = false
+  }, [])
+
   return (
-    <Wrapper onPointerMove={handlePointerMove} onPointerLeave={handlePointerLeave}>
+    <Wrapper>
       <Canvas
         gl={{ antialias: false }}
         dpr={[1, 2]}
@@ -196,21 +205,24 @@ export const MainMenu: FC = () => {
         <BalatroBackground />
       </Canvas>
 
-      <CenterContent>
-        <TitleLogo src="/title.png" alt="JOSEPH" />
-        <Subtitle>
-          <BalatroText variant="body">Software Developer</BalatroText>
-        </Subtitle>
-        <CardImage
-          ref={cardRef}
-          src={`/cards/${cardTexture}.png`}
-          alt="Personal card"
-        />
-      </CenterContent>
+      <TitleCardArea>
+        <TitleCardWrapper>
+          <TitleLogo src="/title.png" alt="JOSEPH" />
+          <CardImage
+            ref={cardRef}
+            src={`/cards/${cardTexture}.png`}
+            alt="Personal card"
+            onPointerDown={handleCardPointerDown}
+            onPointerMove={handleCardPointerMove}
+            onPointerUp={handleCardPointerUp}
+            draggable={false}
+          />
+        </TitleCardWrapper>
+      </TitleCardArea>
 
       <ButtonBar>
         <MenuButton color="blue" onClick={() => dispatch(navigateTo('projects'))}>
-          Projects
+          Play
         </MenuButton>
         <MenuButton color="orange" onClick={() => dispatch(openModal('about'))}>
           About
