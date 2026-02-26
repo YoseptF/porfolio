@@ -1,4 +1,4 @@
-import { type FC, type ReactNode } from 'react'
+import { type FC } from 'react'
 import { useTransition, animated } from '@react-spring/web'
 import styled from 'styled-components'
 import { useAppSelector } from '../../store/hooks'

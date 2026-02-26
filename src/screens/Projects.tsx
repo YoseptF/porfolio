@@ -1,30 +1,55 @@
-import { type FC } from 'react'
+import { type FC, Suspense, useCallback } from 'react'
 import styled from 'styled-components'
-import { BalatroText } from '../components/ui/BalatroText'
-import { BalatroButton } from '../components/ui/BalatroButton'
-import { useAppDispatch } from '../store/hooks'
-import { navigateTo } from '../store/slices/navigation'
+import { Canvas } from '@react-three/fiber'
+import { FeltBackground } from '../components/three/FeltBackground'
+import { CardFan } from '../components/three/CardFan'
+import { ProjectSidebar } from '../components/ui/ProjectSidebar'
+import { ActionButtons } from '../components/ui/ActionButtons'
+import { useAppDispatch, useAppSelector } from '../store/hooks'
+import { selectProject, selectSelectedProjectIndex } from '../store/slices/navigation'
 
-const Placeholder = styled.div`
+const Wrapper = styled.div`
+  position: relative;
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 24px;
-  background: #1a2e1a;
+`
+
+const Overlay = styled.div`
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
 `
 
 export const Projects: FC = () => {
   const dispatch = useAppDispatch()
+  const selectedIndex = useAppSelector(selectSelectedProjectIndex)
+
+  const handleSelect = useCallback(
+    (index: number | null) => {
+      dispatch(selectProject(index))
+    },
+    [dispatch],
+  )
 
   return (
-    <Placeholder>
-      <BalatroText variant="heading">Projects — Coming Soon</BalatroText>
-      <BalatroButton color="red" onClick={() => dispatch(navigateTo('menu'))}>
-        Back
-      </BalatroButton>
-    </Placeholder>
+    <Wrapper>
+      <Canvas
+        gl={{ antialias: false }}
+        dpr={[1, 2]}
+        camera={{ position: [0, 0, 5], fov: 50 }}
+        style={{ position: 'absolute', inset: 0 }}
+      >
+        <FeltBackground />
+        <Suspense fallback={null}>
+          <CardFan selectedIndex={selectedIndex} onSelect={handleSelect} />
+        </Suspense>
+      </Canvas>
+
+      <Overlay>
+        <ProjectSidebar selectedIndex={selectedIndex} />
+        <ActionButtons selectedIndex={selectedIndex} />
+      </Overlay>
+    </Wrapper>
   )
 }
