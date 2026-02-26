@@ -1,6 +1,5 @@
 import { type FC, useRef, useMemo } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
-import { ScreenQuad } from '@react-three/drei'
 import * as THREE from 'three'
 import vertexShader from '../../assets/shaders/felt-bg.vert'
 import fragmentShader from '../../assets/shaders/felt-bg.frag'
@@ -13,13 +12,13 @@ export const FeltBackground: FC<FeltBackgroundProps> = ({
   color = [0.21, 0.40, 0.30],
 }) => {
   const materialRef = useRef<THREE.ShaderMaterial>(null)
-  const { size } = useThree()
+  const { gl } = useThree()
 
   const uniforms = useMemo(
     () => ({
       uTime: { value: 0 },
       uColor: { value: new THREE.Vector3(...color) },
-      uResolution: { value: new THREE.Vector2(size.width, size.height) },
+      uResolution: { value: new THREE.Vector2(gl.domElement.width, gl.domElement.height) },
     }),
     [],
   )
@@ -29,11 +28,12 @@ export const FeltBackground: FC<FeltBackgroundProps> = ({
     if (!mat) return
     const u = mat.uniforms
     if (u.uTime) u.uTime.value += delta
-    if (u.uResolution) u.uResolution.value.set(size.width, size.height)
+    if (u.uResolution) u.uResolution.value.set(gl.domElement.width, gl.domElement.height)
   })
 
   return (
-    <ScreenQuad renderOrder={-1}>
+    <mesh renderOrder={-1} frustumCulled={false}>
+      <planeGeometry args={[2, 2]} />
       <shaderMaterial
         ref={materialRef}
         vertexShader={vertexShader}
@@ -42,6 +42,6 @@ export const FeltBackground: FC<FeltBackgroundProps> = ({
         depthWrite={false}
         depthTest={false}
       />
-    </ScreenQuad>
+    </mesh>
   )
 }

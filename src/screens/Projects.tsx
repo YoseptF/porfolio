@@ -9,9 +9,8 @@ import { useAppDispatch, useAppSelector } from '../store/hooks'
 import { selectProject, selectSelectedProjectIndex } from '../store/slices/navigation'
 
 const Wrapper = styled.div`
-  position: relative;
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  inset: 0;
 `
 
 const Overlay = styled.div`

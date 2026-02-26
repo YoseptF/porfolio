@@ -4,8 +4,6 @@ uniform float uTime;
 uniform vec3 uColor;
 uniform vec2 uResolution;
 
-varying vec2 vUv;
-
 float hash(vec2 p) {
   return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
 }
@@ -24,8 +22,7 @@ float noise(vec2 p) {
 }
 
 void main() {
-  vec2 uv = vUv;
-  float aspect = uResolution.x / uResolution.y;
+  vec2 uv = gl_FragCoord.xy / uResolution.xy;
 
   float grain = noise(uv * 300.0) * 0.06;
   float wave = sin(uv.x * 20.0 + uTime * 0.3) * sin(uv.y * 20.0 + uTime * 0.2) * 0.015;

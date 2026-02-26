@@ -7,7 +7,7 @@ import { BalatroPanel } from './BalatroPanel'
 import { projects } from '../../data/projects'
 import { theme } from '../../styles/theme'
 import { useAppDispatch } from '../../store/hooks'
-import { navigateTo } from '../../store/slices/navigation'
+import { navigateTo, openModal } from '../../store/slices/navigation'
 
 interface ProjectSidebarProps {
   selectedIndex: number | null
@@ -107,10 +107,10 @@ export const ProjectSidebar: FC<ProjectSidebarProps> = ({ selectedIndex }) => {
                 <BalatroText variant="chips">{projects.length} Projects</BalatroText>
               </StatsRow>
               <NavButtons>
-                <BalatroButton color="orange" onClick={() => dispatch(navigateTo('about'))}>
+                <BalatroButton color="orange" onClick={() => dispatch(openModal('about'))}>
                   About
                 </BalatroButton>
-                <BalatroButton color="red" onClick={() => dispatch(navigateTo('contact'))}>
+                <BalatroButton color="red" onClick={() => dispatch(openModal('contact'))}>
                   Contact
                 </BalatroButton>
               </NavButtons>

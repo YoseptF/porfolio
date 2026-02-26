@@ -1,43 +1,49 @@
 import { type FC, useRef, useMemo } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
-import { ScreenQuad } from '@react-three/drei'
 import * as THREE from 'three'
 import vertexShader from '../../assets/shaders/balatro-bg.vert'
 import fragmentShader from '../../assets/shaders/balatro-bg.frag'
 
 interface BalatroBackgroundProps {
-  color1?: [number, number, number]
-  color2?: [number, number, number]
-  color3?: [number, number, number]
+  color1?: [number, number, number, number]
+  color2?: [number, number, number, number]
+  color3?: [number, number, number, number]
   contrast?: number
   spinAmount?: number
   spinSpeed?: number
   pixelFilter?: number
+  spinEase?: number
+  zoom?: number
 }
 
 export const BalatroBackground: FC<BalatroBackgroundProps> = ({
-  color1 = [0.91, 0.36, 0.29],
-  color2 = [0.29, 0.59, 0.89],
-  color3 = [0.03, 0.03, 0.06],
-  contrast = 1.5,
-  spinAmount = 6.0,
-  spinSpeed = 0.4,
-  pixelFilter = 200.0,
+  color1 = [0.9, 0.1, 0.1, 1.0],
+  color2 = [0.1, 0.3, 0.85, 1.0],
+  color3 = [0.02, 0.02, 0.04, 1.0],
+  contrast = 1.2,
+  spinAmount = 0.5,
+  spinSpeed = 1.0,
+  pixelFilter = 1000.0,
+  spinEase = 0.5,
+  zoom = 30.0,
 }) => {
   const materialRef = useRef<THREE.ShaderMaterial>(null)
-  const { size } = useThree()
+  const { gl } = useThree()
 
   const uniforms = useMemo(
     () => ({
-      uTime: { value: 0 },
-      uColor1: { value: new THREE.Vector3(...color1) },
-      uColor2: { value: new THREE.Vector3(...color2) },
-      uColor3: { value: new THREE.Vector3(...color3) },
-      uContrast: { value: contrast },
-      uSpinAmount: { value: spinAmount },
-      uSpinSpeed: { value: spinSpeed },
-      uPixelFilter: { value: pixelFilter },
-      uResolution: { value: new THREE.Vector2(size.width, size.height) },
+      time: { value: 0 },
+      spin_time: { value: 0 },
+      contrast: { value: contrast },
+      spin_amount: { value: spinAmount },
+      pixel_fac: { value: pixelFilter },
+      spin_ease: { value: spinEase },
+      zoom: { value: zoom },
+      offset: { value: new THREE.Vector2(-0.12, 0) },
+      resolution: { value: new THREE.Vector2(gl.domElement.width, gl.domElement.height) },
+      colour_1: { value: new THREE.Vector4(...color1) },
+      colour_2: { value: new THREE.Vector4(...color2) },
+      colour_3: { value: new THREE.Vector4(...color3) },
     }),
     [],
   )
@@ -46,12 +52,14 @@ export const BalatroBackground: FC<BalatroBackgroundProps> = ({
     const mat = materialRef.current
     if (!mat) return
     const u = mat.uniforms
-    if (u.uTime) u.uTime.value += delta
-    if (u.uResolution) u.uResolution.value.set(size.width, size.height)
+    if (u.time) u.time.value += delta
+    if (u.spin_time) u.spin_time.value += delta * spinSpeed
+    if (u.resolution) u.resolution.value.set(gl.domElement.width, gl.domElement.height)
   })
 
   return (
-    <ScreenQuad renderOrder={-1}>
+    <mesh renderOrder={-1} frustumCulled={false}>
+      <planeGeometry args={[2, 2]} />
       <shaderMaterial
         ref={materialRef}
         vertexShader={vertexShader}
@@ -60,6 +68,6 @@ export const BalatroBackground: FC<BalatroBackgroundProps> = ({
         depthWrite={false}
         depthTest={false}
       />
-    </ScreenQuad>
+    </mesh>
   )
 }

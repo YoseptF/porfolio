@@ -5,7 +5,7 @@ import { BalatroBackground } from '../components/three/BalatroBackground'
 import { BalatroButton } from '../components/ui/BalatroButton'
 import { BalatroText } from '../components/ui/BalatroText'
 import { useAppDispatch } from '../store/hooks'
-import { navigateTo } from '../store/slices/navigation'
+import { navigateTo, openModal } from '../store/slices/navigation'
 import { theme } from '../styles/theme'
 
 const personalCards = ['happy', 'cool', 'coffe', 'shocked', 'te', 'workout', 'call']
@@ -18,9 +18,8 @@ const randomCard = () => {
 const cardTexture = randomCard()
 
 const Wrapper = styled.div`
-  position: relative;
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  inset: 0;
 `
 
 const Overlay = styled.div`
@@ -140,13 +139,13 @@ export const MainMenu: FC = () => {
           <BalatroButton color="blue" onClick={() => dispatch(navigateTo('projects'))}>
             Projects
           </BalatroButton>
-          <BalatroButton color="orange" onClick={() => dispatch(navigateTo('about'))}>
+          <BalatroButton color="orange" onClick={() => dispatch(openModal('about'))}>
             About
           </BalatroButton>
-          <BalatroButton color="red" onClick={() => dispatch(navigateTo('contact'))}>
+          <BalatroButton color="red" onClick={() => dispatch(openModal('contact'))}>
             Contact
           </BalatroButton>
-          <BalatroButton color="green" onClick={() => dispatch(navigateTo('skills'))}>
+          <BalatroButton color="green" onClick={() => dispatch(openModal('skills'))}>
             Skills
           </BalatroButton>
         </ButtonRow>
