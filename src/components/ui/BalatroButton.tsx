@@ -22,14 +22,17 @@ const colorMap: Record<ButtonColor, string> = {
 
 const StyledButton = styled.button<{ $color: ButtonColor }>`
   font-family: ${theme.font.family};
-  font-size: 1.3rem;
+  font-size: 1.6rem;
+  font-weight: bold;
   letter-spacing: 1px;
+  text-transform: uppercase;
+  text-align: center;
   color: ${theme.colors.text.white};
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
   background: ${({ $color }) => colorMap[$color]};
   border: 3px solid rgba(0, 0, 0, 0.4);
   border-radius: ${theme.radii.md};
-  padding: 10px 28px;
+  padding: 14px 32px;
   cursor: pointer;
   position: relative;
   transition: transform 0.1s, filter 0.1s;
