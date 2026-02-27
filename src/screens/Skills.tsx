@@ -1,16 +1,11 @@
 import { type FC } from 'react'
 import styled from 'styled-components'
 import { BalatroText } from '../components/ui/BalatroText'
-import { BalatroButton } from '../components/ui/BalatroButton'
+import { ModalWrapper } from '../components/ui/ModalWrapper'
 import { useAppDispatch } from '../store/hooks'
 import { closeModal } from '../store/slices/navigation'
 import { skills } from '../data/skills'
 import { theme } from '../styles/theme'
-
-const PanelContainer = styled.div`
-  max-width: 550px;
-  width: 100%;
-`
 
 const Header = styled.div`
   text-align: center;
@@ -71,16 +66,11 @@ const SkillLevel = styled.div<{ $level: string }>`
   letter-spacing: 1px;
 `
 
-const BackRow = styled.div`
-  display: flex;
-  justify-content: center;
-`
-
 export const Skills: FC = () => {
   const dispatch = useAppDispatch()
 
   return (
-    <PanelContainer>
+    <ModalWrapper maxWidth="550px" onBack={() => dispatch(closeModal())}>
       <Header>
         <BalatroText variant="heading">COLLECTION</BalatroText>
       </Header>
@@ -93,12 +83,6 @@ export const Skills: FC = () => {
           </SkillCard>
         ))}
       </Grid>
-
-      <BackRow>
-        <BalatroButton color="orange" onClick={() => dispatch(closeModal())}>
-          Back
-        </BalatroButton>
-      </BackRow>
-    </PanelContainer>
+    </ModalWrapper>
   )
 }

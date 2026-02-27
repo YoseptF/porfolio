@@ -37,6 +37,13 @@ export const theme = {
 
 export type Theme = typeof theme
 
+export const shadows = {
+  dropShadowHard: 'drop-shadow(0 5px 0 rgba(0,0,0,0.6))',
+  dropShadowSoft: 'drop-shadow(-4px 4px 0 rgba(0,0,0,0.6))',
+  textShadowDark: '1px 1px 0 rgba(0,0,0,0.8)',
+  textShadowMid: '1px 1px 0 rgba(0,0,0,0.5)',
+}
+
 export const pixelatedClipPath = (step = 6): string => {
   const c = step * 2
   return `clip-path: polygon(

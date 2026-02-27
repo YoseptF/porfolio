@@ -10,6 +10,8 @@ interface BalatroTextProps {
   className?: string
 }
 
+const shadowBlack = '1px 1px 0 #000'
+
 const variantStyles: Record<TextVariant, { color: string; fontSize: string; textShadow: string }> = {
   title: {
     color: theme.colors.text.white,
@@ -24,22 +26,22 @@ const variantStyles: Record<TextVariant, { color: string; fontSize: string; text
   body: {
     color: theme.colors.text.white,
     fontSize: '1.2rem',
-    textShadow: '1px 1px 0 #000',
+    textShadow: shadowBlack,
   },
   chips: {
     color: theme.colors.text.chips,
     fontSize: '1.4rem',
-    textShadow: '1px 1px 0 #000',
+    textShadow: shadowBlack,
   },
   mult: {
     color: theme.colors.text.mult,
     fontSize: '1.4rem',
-    textShadow: '1px 1px 0 #000',
+    textShadow: shadowBlack,
   },
   gold: {
     color: theme.colors.text.gold,
     fontSize: '1.4rem',
-    textShadow: '1px 1px 0 #000',
+    textShadow: shadowBlack,
   },
 }
 

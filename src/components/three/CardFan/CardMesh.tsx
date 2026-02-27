@@ -1,8 +1,11 @@
 import { type FC, useRef, useState, useCallback } from 'react'
-import { useThree, useLoader } from '@react-three/fiber'
-import { useSpring, animated } from '@react-spring/three'
+import { animated, useSpring } from '@react-spring/three'
 import * as THREE from 'three'
-import { projects } from '../../data/projects'
+
+export const SPREAD_ANGLE = 30
+export const ARC_RADIUS = 3.5
+export const CARD_WIDTH = 0.8
+export const CARD_HEIGHT = 1.12
 
 interface CardMeshProps {
   texture: THREE.Texture
@@ -12,16 +15,11 @@ interface CardMeshProps {
   onSelect: (index: number) => void
 }
 
-const SPREAD_ANGLE = 30
-const ARC_RADIUS = 3.5
-const CARD_WIDTH = 0.8
-const CARD_HEIGHT = 1.12
-
-const CardMesh: FC<CardMeshProps> = ({ texture, index, total, selected, onSelect }) => {
+export const CardMesh: FC<CardMeshProps> = ({ texture, index, total, selected, onSelect }) => {
   const [hovered, setHovered] = useState(false)
   const meshRef = useRef<THREE.Mesh>(null)
 
-  const centerOffset = (index - (total - 1) / 2)
+  const centerOffset = index - (total - 1) / 2
   const angleRad = (centerOffset / (total - 1)) * SPREAD_ANGLE * (Math.PI / 180)
   const baseX = Math.sin(angleRad) * ARC_RADIUS
   const baseY = -Math.cos(angleRad) * ARC_RADIUS + ARC_RADIUS - 1.5
@@ -50,11 +48,7 @@ const CardMesh: FC<CardMeshProps> = ({ texture, index, total, selected, onSelect
       onClick={handleClick}
     >
       <planeGeometry args={[CARD_WIDTH, CARD_HEIGHT]} />
-      <meshBasicMaterial
-        map={texture}
-        side={THREE.DoubleSide}
-        transparent
-      />
+      <meshBasicMaterial map={texture} side={THREE.DoubleSide} transparent />
       {selected && (
         <mesh position={[0, 0, -0.001]}>
           <planeGeometry args={[CARD_WIDTH + 0.06, CARD_HEIGHT + 0.06]} />
@@ -62,42 +56,5 @@ const CardMesh: FC<CardMeshProps> = ({ texture, index, total, selected, onSelect
         </mesh>
       )}
     </animated.mesh>
-  )
-}
-
-interface CardFanProps {
-  selectedIndex: number | null
-  onSelect: (index: number | null) => void
-}
-
-export const CardFan: FC<CardFanProps> = ({ selectedIndex, onSelect }) => {
-  const { viewport } = useThree()
-  const textures = useLoader(
-    THREE.TextureLoader,
-    projects.map((p) => `/cards/${p.texture}.png`),
-  )
-
-  const handleSelect = useCallback(
-    (index: number) => {
-      onSelect(selectedIndex === index ? null : index)
-    },
-    [selectedIndex, onSelect],
-  )
-
-  const scaleFactor = Math.min(viewport.width / 8, 1)
-
-  return (
-    <group position={[0, -viewport.height / 2 + 1.8, 0]} scale={scaleFactor}>
-      {textures.map((tex, i) => (
-        <CardMesh
-          key={projects[i]?.name ?? i}
-          texture={tex}
-          index={i}
-          total={projects.length}
-          selected={selectedIndex === i}
-          onSelect={handleSelect}
-        />
-      ))}
-    </group>
   )
 }

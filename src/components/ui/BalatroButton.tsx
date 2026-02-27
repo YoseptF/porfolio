@@ -1,6 +1,6 @@
 import { type FC, type ReactNode } from 'react'
 import styled from 'styled-components'
-import { theme, pixelatedClipPath } from '../../styles/theme'
+import { theme, pixelatedClipPath, shadows } from '../../styles/theme'
 
 type ButtonColor = 'blue' | 'orange' | 'red' | 'green' | 'purple'
 
@@ -28,7 +28,7 @@ const colorMap: Record<ButtonColor, string> = {
  */
 const ShadowWrapper = styled.div`
   display: flex;
-  filter: drop-shadow(0 5px 0 rgba(0, 0, 0, 0.6));
+  filter: ${shadows.dropShadowHard};
   transition: filter 0.1s;
 
   &:hover {
@@ -47,7 +47,7 @@ export const BalatroButtonInner = styled.button<{ $color: ButtonColor }>`
   letter-spacing: 1px;
   text-transform: uppercase;
   color: ${theme.colors.text.white};
-  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+  text-shadow: ${shadows.textShadowMid};
   background-color: ${({ $color }) => colorMap[$color]};
   background-image:
     repeating-linear-gradient(

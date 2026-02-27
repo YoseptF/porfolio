@@ -3,14 +3,10 @@ import styled from 'styled-components'
 import { BalatroText } from '../components/ui/BalatroText'
 import { BalatroButton } from '../components/ui/BalatroButton'
 import { BalatroPanel } from '../components/ui/BalatroPanel'
+import { ModalWrapper } from '../components/ui/ModalWrapper'
 import { useAppDispatch } from '../store/hooks'
 import { closeModal } from '../store/slices/navigation'
 import { theme } from '../styles/theme'
-
-const PanelContainer = styled.div`
-  max-width: 460px;
-  width: 100%;
-`
 
 const Form = styled.form`
   display: flex;
@@ -84,17 +80,11 @@ const ButtonRow = styled.div`
   gap: 12px;
 `
 
-const BackRow = styled.div`
-  margin-top: 12px;
-  display: flex;
-  justify-content: center;
-`
-
 export const Contact: FC = () => {
   const dispatch = useAppDispatch()
 
   return (
-    <PanelContainer>
+    <ModalWrapper maxWidth="460px" onBack={() => dispatch(closeModal())}>
       <BalatroPanel title="CONTACT">
         <Form action="https://formspree.io/xvovpedq" method="POST">
           <BalatroText variant="body">Send me a message!</BalatroText>
@@ -134,12 +124,6 @@ export const Contact: FC = () => {
           </a>
         </SocialRow>
       </BalatroPanel>
-
-      <BackRow>
-        <BalatroButton color="orange" onClick={() => dispatch(closeModal())}>
-          Back
-        </BalatroButton>
-      </BackRow>
-    </PanelContainer>
+    </ModalWrapper>
   )
 }

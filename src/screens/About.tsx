@@ -1,16 +1,11 @@
 import { type FC } from 'react'
 import styled from 'styled-components'
 import { BalatroText } from '../components/ui/BalatroText'
-import { BalatroButton } from '../components/ui/BalatroButton'
 import { BalatroPanel } from '../components/ui/BalatroPanel'
+import { ModalWrapper } from '../components/ui/ModalWrapper'
 import { useAppDispatch } from '../store/hooks'
 import { closeModal } from '../store/slices/navigation'
 import { theme } from '../styles/theme'
-
-const PanelContainer = styled.div`
-  max-width: 500px;
-  width: 100%;
-`
 
 const ProfileSection = styled.div`
   display: flex;
@@ -51,17 +46,11 @@ const StatItem = styled.div`
   text-align: center;
 `
 
-const BackRow = styled.div`
-  margin-top: 12px;
-  display: flex;
-  justify-content: center;
-`
-
 export const About: FC = () => {
   const dispatch = useAppDispatch()
 
   return (
-    <PanelContainer>
+    <ModalWrapper onBack={() => dispatch(closeModal())}>
       <BalatroPanel title="ABOUT">
         <ProfileSection>
           <ProfileImage src="/cards/happy.png" alt="Joseph" />
@@ -98,12 +87,6 @@ export const About: FC = () => {
           </StatItem>
         </StatsRow>
       </BalatroPanel>
-
-      <BackRow>
-        <BalatroButton color="orange" onClick={() => dispatch(closeModal())}>
-          Back
-        </BalatroButton>
-      </BackRow>
-    </PanelContainer>
+    </ModalWrapper>
   )
 }
