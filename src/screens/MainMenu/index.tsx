@@ -28,15 +28,7 @@ import {
 } from "./MainMenuStyles";
 import { BalatroButton } from "../../components/ui/BalatroButton";
 
-const personalCards = [
-  "happy",
-  "cool",
-  "coffe",
-  "shocked",
-  "te",
-  "workout",
-  "call",
-];
+const personalCards = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
 const cardTexture =
   personalCards[Math.floor(Math.random() * personalCards.length)] ??
   personalCards[0];
@@ -66,7 +58,7 @@ export const MainMenu: FC = () => {
           <TitleLogo src="/title.png" alt="JOSEPH" />
           <CardImage
             ref={cardRef}
-            src={`/cards/${cardTexture}.png`}
+            src={`/jokers/${cardTexture}.png`}
             alt="Personal card"
             onPointerDown={onPointerDown}
             onPointerMove={onPointerMove}

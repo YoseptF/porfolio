@@ -10,6 +10,7 @@ interface BalatroButtonProps {
   onClick?: () => void;
   className?: string;
   disabled?: boolean;
+  large?: boolean;
 }
 
 const colorMap: Record<ButtonColor, string> = {
@@ -33,7 +34,7 @@ const ShadowWrapper = styled.div`
   transition: filter 0.1s;
 
   &:hover {
-    filter: brightness(1.15) drop-shadow(0 4px 0 rgba(0, 0, 0, 0.4));
+    filter: brightness(0.85) drop-shadow(0 4px 0 rgba(0, 0, 0, 0.4));
   }
 
   &:active {
@@ -41,9 +42,12 @@ const ShadowWrapper = styled.div`
   }
 `;
 
-export const BalatroButtonInner = styled.button<{ $color: ButtonColor }>`
+export const BalatroButtonInner = styled.button<{
+  $color: ButtonColor;
+  $large: boolean;
+}>`
   font-family: ${theme.font.family};
-  font-size: 1.6rem;
+  font-size: ${({ $large }) => ($large ? "2.6rem" : "1.6rem")};
   font-weight: bold;
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -74,10 +78,6 @@ export const BalatroButtonInner = styled.button<{ $color: ButtonColor }>`
   justify-content: center;
   ${pixelatedClipPath(5)}
 
-  &:hover {
-    transform: translateY(-2px);
-  }
-
   &:active {
     transform: translateY(2px);
   }
@@ -95,9 +95,15 @@ export const BalatroButton: FC<BalatroButtonProps> = ({
   onClick,
   className,
   disabled = false,
+  large = false,
 }) => (
   <ShadowWrapper className={className}>
-    <BalatroButtonInner $color={color} onClick={onClick} disabled={disabled}>
+    <BalatroButtonInner
+      $color={color}
+      $large={large}
+      onClick={onClick}
+      disabled={disabled}
+    >
       {children}
     </BalatroButtonInner>
   </ShadowWrapper>

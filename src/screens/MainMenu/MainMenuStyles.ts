@@ -63,8 +63,6 @@ export const CardImage = styled.img`
   min-width: 150px;
   max-width: 240px;
   height: auto;
-  border-radius: 8px;
-  border: 3px solid rgba(255, 255, 255, 0.35);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
   pointer-events: auto;
   z-index: 2;
