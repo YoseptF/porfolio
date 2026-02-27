@@ -20,7 +20,6 @@ import {
   BottomArea,
   ProfileContainer,
   ProfileLabel,
-  ProfileValue,
   ButtonsContainer,
   PlayButton,
   MenuButton,
@@ -71,7 +70,7 @@ export const MainMenu: FC = () => {
       <BottomArea>
         <ProfileContainer>
           <ProfileLabel>Profile</ProfileLabel>
-          <BalatroButton color="grey">Joseph</BalatroButton>
+          <BalatroButton color="grey" href="/docs/josephFloresATS.pdf" target="_blank" rel="noopener noreferrer">Joseph</BalatroButton>
         </ProfileContainer>
 
         <ButtonsContainer>
@@ -120,7 +119,7 @@ export const MainMenu: FC = () => {
           </SocialIconButton>
           <SocialIconButton
             $bgColor="#7D3C98"
-            href="https://github.com/YoseptF"
+            href="/docs/josephFloresATS.pdf"
             target="_blank"
             rel="noopener noreferrer"
           >

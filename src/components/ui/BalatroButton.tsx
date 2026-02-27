@@ -4,14 +4,15 @@ import { theme, pixelatedClipPath, shadows } from "../../styles/theme";
 
 type ButtonColor = "blue" | "orange" | "red" | "green" | "purple" | "grey";
 
-interface BalatroButtonProps {
+type BalatroButtonProps = {
   color?: ButtonColor;
   children: ReactNode;
-  onClick?: () => void;
   className?: string;
-  disabled?: boolean;
   large?: boolean;
-}
+} & (
+  | { href: string; target?: string; rel?: string; onClick?: never; disabled?: never }
+  | { href?: never; onClick?: () => void; disabled?: boolean; target?: never; rel?: never }
+);
 
 const colorMap: Record<ButtonColor, string> = {
   blue: theme.colors.button.blue,
@@ -92,19 +93,31 @@ export const BalatroButtonInner = styled.button<{
 export const BalatroButton: FC<BalatroButtonProps> = ({
   color = "blue",
   children,
-  onClick,
   className,
-  disabled = false,
   large = false,
+  ...rest
 }) => (
   <ShadowWrapper className={className}>
-    <BalatroButtonInner
-      $color={color}
-      $large={large}
-      onClick={onClick}
-      disabled={disabled}
-    >
-      {children}
-    </BalatroButtonInner>
+    {rest.href !== undefined ? (
+      <BalatroButtonInner
+        as="a"
+        $color={color}
+        $large={large}
+        href={rest.href}
+        target={rest.target}
+        rel={rest.rel}
+      >
+        {children}
+      </BalatroButtonInner>
+    ) : (
+      <BalatroButtonInner
+        $color={color}
+        $large={large}
+        onClick={rest.onClick}
+        disabled={rest.disabled ?? false}
+      >
+        {children}
+      </BalatroButtonInner>
+    )}
   </ShadowWrapper>
 );
