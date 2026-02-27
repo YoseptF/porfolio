@@ -1,15 +1,15 @@
-import { type FC, type ReactNode } from 'react'
-import styled from 'styled-components'
-import { theme, pixelatedClipPath, shadows } from '../../styles/theme'
+import { type FC, type ReactNode } from "react";
+import styled from "styled-components";
+import { theme, pixelatedClipPath, shadows } from "../../styles/theme";
 
-type ButtonColor = 'blue' | 'orange' | 'red' | 'green' | 'purple'
+type ButtonColor = "blue" | "orange" | "red" | "green" | "purple" | "grey";
 
 interface BalatroButtonProps {
-  color?: ButtonColor
-  children: ReactNode
-  onClick?: () => void
-  className?: string
-  disabled?: boolean
+  color?: ButtonColor;
+  children: ReactNode;
+  onClick?: () => void;
+  className?: string;
+  disabled?: boolean;
 }
 
 const colorMap: Record<ButtonColor, string> = {
@@ -18,7 +18,8 @@ const colorMap: Record<ButtonColor, string> = {
   red: theme.colors.button.red,
   green: theme.colors.button.green,
   purple: theme.colors.button.purple,
-}
+  grey: theme.colors.button.grey,
+};
 
 /*
  * Shadow lives here, NOT on StyledButton. drop-shadow on an element that also
@@ -38,7 +39,7 @@ const ShadowWrapper = styled.div`
   &:active {
     filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.4));
   }
-`
+`;
 
 export const BalatroButtonInner = styled.button<{ $color: ButtonColor }>`
   font-family: ${theme.font.family};
@@ -86,22 +87,18 @@ export const BalatroButtonInner = styled.button<{ $color: ButtonColor }>`
     cursor: not-allowed;
     transform: none;
   }
-`
+`;
 
 export const BalatroButton: FC<BalatroButtonProps> = ({
-  color = 'blue',
+  color = "blue",
   children,
   onClick,
   className,
   disabled = false,
 }) => (
   <ShadowWrapper className={className}>
-    <BalatroButtonInner
-      $color={color}
-      onClick={onClick}
-      disabled={disabled}
-    >
+    <BalatroButtonInner $color={color} onClick={onClick} disabled={disabled}>
       {children}
     </BalatroButtonInner>
   </ShadowWrapper>
-)
+);

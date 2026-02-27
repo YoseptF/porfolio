@@ -1,6 +1,10 @@
-import styled from 'styled-components'
-import { theme, pixelatedClipPath, shadows } from '../../styles/theme'
-import { BalatroButton, BalatroButtonInner } from '../../components/ui/BalatroButton'
+import styled from "styled-components";
+import { theme, pixelatedClipPath, shadows } from "../../styles/theme";
+import {
+  BalatroButton,
+  BalatroButtonInner,
+} from "../../components/ui/BalatroButton";
+import { SocialIconButton } from "./SocialIcons";
 
 const panelStyle = `
   position: relative;
@@ -16,32 +20,32 @@ const panelStyle = `
     ${pixelatedClipPath(6)}
     z-index: -1;
   }
-`
+`;
 
 export const Wrapper = styled.div`
   position: absolute;
   inset: 0;
-`
+`;
 
 export const TitleCardArea = styled.div`
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  bottom: 15vh;
+  bottom: 18vh;
   display: flex;
   align-items: center;
   justify-content: center;
   pointer-events: none;
   z-index: 1;
-`
+`;
 
 export const TitleCardWrapper = styled.div`
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-`
+`;
 
 export const TitleLogo = styled.img`
   width: 75vw;
@@ -51,7 +55,7 @@ export const TitleLogo = styled.img`
   @media (max-width: 600px) {
     width: 90vw;
   }
-`
+`;
 
 export const CardImage = styled.img`
   position: absolute;
@@ -75,7 +79,7 @@ export const CardImage = styled.img`
     width: 28vw;
     min-width: 100px;
   }
-`
+`;
 
 export const VersionText = styled.div`
   position: absolute;
@@ -90,25 +94,33 @@ export const VersionText = styled.div`
   pointer-events: none;
   z-index: 3;
   text-shadow: ${shadows.textShadowDark};
-`
+`;
 
 export const BottomArea = styled.div`
   position: absolute;
   bottom: 30px;
   left: 10px;
   right: 10px;
-  height: 15vh;
-  min-height: 120px;
+  height: 12vh;
+  min-height: 140px;
   display: flex;
   align-items: stretch;
   gap: 8px;
   pointer-events: auto;
   z-index: 2;
-`
+
+  @media (max-width: 600px) {
+    bottom: 10px;
+    flex-direction: column;
+    height: calc(15vh + 108px);
+    min-height: 130px;
+    max-height: 155px;
+  }
+`;
 
 const PixelPanel = styled.div`
   ${panelStyle}
-`
+`;
 
 export const ProfileContainer = styled(PixelPanel)`
   display: flex;
@@ -117,17 +129,22 @@ export const ProfileContainer = styled(PixelPanel)`
   padding: 6px 14px;
   flex-shrink: 0;
   gap: 4px;
-`
+  align-items: center;
+
+  @media (max-width: 600px) {
+    display: none;
+  }
+`;
 
 export const ProfileLabel = styled.span`
   font-family: ${theme.font.family};
-  font-size: 1rem;
-  color: ${theme.colors.text.muted};
+  font-size: 2rem;
+  color: ${theme.colors.text.white};
   letter-spacing: 1px;
   text-transform: uppercase;
   padding-bottom: 4px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-`
+  display: inline-block;
+`;
 
 export const ProfileValue = styled.span`
   font-family: ${theme.font.family};
@@ -136,7 +153,7 @@ export const ProfileValue = styled.span`
   letter-spacing: 1px;
   text-transform: uppercase;
   padding-top: 2px;
-`
+`;
 
 export const ButtonsContainer = styled(PixelPanel)`
   display: flex;
@@ -144,7 +161,11 @@ export const ButtonsContainer = styled(PixelPanel)`
   gap: 6px;
   padding: 6px 6px 12px 6px;
   flex: 1;
-`
+
+  @media (max-width: 600px) {
+    align-items: stretch;
+  }
+`;
 
 export const PlayButton = styled(BalatroButton)`
   flex: 1.5;
@@ -160,20 +181,63 @@ export const PlayButton = styled(BalatroButton)`
   }
 
   ${BalatroButtonInner} {
-    font-size: 3.3rem;
+    font-size: clamp(3.3rem, 4vw, 5.5rem);
     white-space: nowrap;
     padding: 0 10px;
   }
-`
+
+  @media (max-width: 600px) {
+    ${BalatroButtonInner} {
+      font-size: clamp(1.5rem, 5vw, 2.5rem);
+    }
+  }
+`;
 
 export const MenuButton = styled(BalatroButton)`
   flex: 1;
-  height: calc(15vh * 0.62 - 12px);
-  min-height: 92px;
+  min-height: calc(100% - 12px);
 
   ${BalatroButtonInner} {
-    font-size: 2.4rem;
+    font-size: clamp(2.4rem, 3vw, 4rem);
     white-space: nowrap;
     padding: 0 10px;
   }
-`
+
+  @media (max-width: 600px) {
+    height: auto;
+    min-height: unset;
+    align-self: stretch;
+
+    ${BalatroButtonInner} {
+      font-size: clamp(1rem, 3.5vw, 1.8rem);
+    }
+  }
+`;
+
+export const SocialsRow = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  gap: 8px;
+
+  @media (min-width: 601px) {
+    ${SocialIconButton}:last-child {
+      display: none;
+    }
+  }
+
+  @media (max-width: 600px) {
+    order: -1;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-self: stretch;
+    height: auto;
+    min-height: unset;
+
+    ${SocialIconButton} {
+      flex: none;
+      width: 50px;
+      height: 50px;
+    }
+  }
+`;
