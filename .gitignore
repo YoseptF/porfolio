@@ -3,3 +3,7 @@ dist
 *.local
 .DS_Store
 *.log
+build/**/*
+tmp/**/*
+.serena/**/*
+.claude/**/*
