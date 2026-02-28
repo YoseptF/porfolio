@@ -38,10 +38,14 @@ export const useCardDrag = () => {
     if (!card) return
 
     card.setPointerCapture(e.pointerId)
-    const rect = card.getBoundingClientRect()
+    const parentRect = card.parentElement?.getBoundingClientRect()
+    if (!parentRect) return
+
+    const centerX = parentRect.left + parentRect.width / 2
+    const centerY = parentRect.top + parentRect.height / 2
     dragState.current.dragging = true
-    dragState.current.offsetX = e.clientX - rect.left - rect.width / 2 - dragState.current.x
-    dragState.current.offsetY = e.clientY - rect.top - rect.height / 2 - dragState.current.y
+    dragState.current.offsetX = e.clientX - centerX - dragState.current.x
+    dragState.current.offsetY = e.clientY - centerY - dragState.current.y
   }, [])
 
   const onPointerMove = useCallback((e: React.PointerEvent<HTMLImageElement>) => {

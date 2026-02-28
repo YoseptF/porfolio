@@ -5,6 +5,7 @@ import { BalatroButton } from '../BalatroButton'
 const Container = styled.div<{ $maxWidth: string }>`
   max-width: ${({ $maxWidth }) => $maxWidth};
   width: 100%;
+  margin: 0 auto;
 `
 
 const BackRow = styled.div`

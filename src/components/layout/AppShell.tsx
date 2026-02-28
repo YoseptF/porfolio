@@ -1,8 +1,8 @@
 import { type FC } from 'react'
 import { useTransition, animated } from '@react-spring/web'
 import styled from 'styled-components'
-import { useAppSelector } from '../../store/hooks'
-import { selectCurrentScreen, selectActiveModal } from '../../store/slices/navigation'
+import { useAppSelector, useAppDispatch } from '../../store/hooks'
+import { selectCurrentScreen, selectActiveModal, closeModal } from '../../store/slices/navigation'
 import { MainMenu } from '../../screens/MainMenu/index'
 import { Projects } from '../../screens/Projects'
 import { About } from '../../screens/About'
@@ -32,7 +32,7 @@ const AnimatedScreen = styled(animated.div)`
   will-change: opacity;
 `
 
-const ModalBackdrop = styled(animated.div)`
+const ModalBackdrop = styled.div`
   position: absolute;
   inset: 0;
   z-index: 10;
@@ -43,6 +43,7 @@ const ModalBackdrop = styled(animated.div)`
 `
 
 export const AppShell: FC = () => {
+  const dispatch = useAppDispatch()
   const currentScreen = useAppSelector(selectCurrentScreen)
   const activeModal = useAppSelector(selectActiveModal)
 
@@ -54,10 +55,13 @@ export const AppShell: FC = () => {
   })
 
   const modalTransitions = useTransition(activeModal, {
-    from: { opacity: 0, transform: 'scale(0.9)' },
-    enter: { opacity: 1, transform: 'scale(1)' },
-    leave: { opacity: 0, transform: 'scale(0.9)' },
-    config: { tension: 300, friction: 26 },
+    from: { opacity: 0, y: 1100 },
+    enter: { opacity: 1, y: 0 },
+    leave: [{ y: -60 }, { y: 1100 }],
+    config: (_item, _index, phase) =>
+      phase === 'leave'
+        ? { tension: 500, friction: 45 }
+        : { tension: 320, friction: 18 },
   })
 
   return (
@@ -77,8 +81,8 @@ export const AppShell: FC = () => {
         const ModalComponent = modalComponents[modal]
         if (!ModalComponent) return null
         return (
-          <ModalBackdrop style={{ opacity: style.opacity }}>
-            <animated.div style={{ transform: style.transform }}>
+          <ModalBackdrop onClick={() => dispatch(closeModal())}>
+            <animated.div style={{ ...style, width: '100%' }} onClick={(e) => e.stopPropagation()}>
               <ModalComponent />
             </animated.div>
           </ModalBackdrop>
