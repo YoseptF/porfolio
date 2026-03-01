@@ -10,6 +10,7 @@ export const SocialIconButton = styled.a<{ $bgColor: string }>`
   height: 55px;
   background: ${({ $bgColor }) => $bgColor};
   border-radius: 8px;
+  border: none;
   cursor: pointer;
   text-decoration: none;
   filter: ${shadows.dropShadowSoft};
@@ -49,5 +50,12 @@ export const LinkedInIcon: FC = () => (
 export const ResumeIcon: FC = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
     <path d="M14 2H6C4.9 2 4 2.9 4 4v16c0 1.1.89 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" />
+  </svg>
+);
+
+export const MusicOffIcon: FC = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+    <line x1="3" y1="3" x2="21" y2="21" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
   </svg>
 );

@@ -1,23 +1,25 @@
-import { type FC } from 'react'
+import { type FC, useEffect } from 'react'
 import { useTransition, animated } from '@react-spring/web'
 import styled from 'styled-components'
 import { useAppSelector, useAppDispatch } from '../../store/hooks'
 import { selectCurrentScreen, selectActiveModal, closeModal } from '../../store/slices/navigation'
 import { MainMenu } from '../../screens/MainMenu/index'
-import { Projects } from '../../screens/Projects'
 import { About } from '../../screens/About'
 import { Contact } from '../../screens/Contact'
 import { Skills } from '../../screens/Skills'
+import { PlayModal } from '../../screens/Play'
+import { Music } from '../../screens/Music'
 
 const screenComponents: Record<string, FC> = {
   menu: MainMenu,
-  projects: Projects,
 }
 
 const modalComponents: Record<string, FC> = {
   about: About,
   contact: Contact,
   skills: Skills,
+  play: PlayModal,
+  music: Music,
 }
 
 const Container = styled.div`
@@ -52,6 +54,15 @@ export const AppShell: FC = () => {
   const dispatch = useAppDispatch()
   const currentScreen = useAppSelector(selectCurrentScreen)
   const activeModal = useAppSelector(selectActiveModal)
+
+  useEffect(() => {
+    if (localStorage.getItem("playMusic") !== "true") return;
+    localStorage.removeItem("playMusic");
+    const audio = new Audio("/music/theme.mp3");
+    audio.loop = true;
+    audio.volume = 0.5;
+    audio.play().catch(() => {});
+  }, []);
 
   const screenTransitions = useTransition(currentScreen, {
     from: { opacity: 0 },

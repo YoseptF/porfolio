@@ -2,7 +2,7 @@ import { type FC, useState, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 import { BalatroBackground } from "../../components/three/BalatroBackground";
 import { useAppDispatch } from "../../store/hooks";
-import { navigateTo, openModal } from "../../store/slices/navigation";
+import { openModal } from "../../store/slices/navigation";
 import { useCardDrag } from "./useCardDrag";
 import {
   GitHubIcon,
@@ -149,7 +149,7 @@ export const MainMenu: FC = () => {
         <ButtonsContainer>
           <PlayButton
             color="blue"
-            onClick={() => dispatch(navigateTo("projects"))}
+            onClick={() => dispatch(openModal("play"))}
           >
             Play
           </PlayButton>
