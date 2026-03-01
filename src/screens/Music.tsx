@@ -4,8 +4,9 @@ import { BalatroButton } from "../components/ui/BalatroButton";
 import { BalatroPanel } from "../components/ui/BalatroPanel";
 import { BalatroText } from "../components/ui/BalatroText";
 import { ModalWrapper } from "../components/ui/ModalWrapper";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { closeModal, selectMusicEnabled, setMusicEnabled } from "../store/slices/navigation";
+import { useAppDispatch } from "../store/hooks";
+import { closeModal } from "../store/slices/navigation";
+import { isMusicEnabled } from "../services/audioPlayer";
 
 const Content = styled.div`
   display: flex;
@@ -18,7 +19,7 @@ const Content = styled.div`
 
 export const Music: FC = () => {
   const dispatch = useAppDispatch();
-  const active = useAppSelector(selectMusicEnabled);
+  const active = isMusicEnabled();
 
   const handleConfirm = () => {
     if (active) {
@@ -26,8 +27,7 @@ export const Music: FC = () => {
     } else {
       localStorage.setItem("musicEnabled", "true");
     }
-    dispatch(setMusicEnabled(!active));
-    dispatch(closeModal());
+    window.location.reload();
   };
 
   return (

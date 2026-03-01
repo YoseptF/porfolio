@@ -1,9 +1,9 @@
-import { type FC, useEffect } from 'react'
+import { type FC, useEffect, useRef } from 'react'
 import { useTransition, animated } from '@react-spring/web'
 import styled from 'styled-components'
 import { useAppSelector, useAppDispatch } from '../../store/hooks'
-import { selectCurrentScreen, selectActiveModal, selectMusicEnabled, closeModal } from '../../store/slices/navigation'
-import { audioPlayer } from '../../services/audioPlayer'
+import { selectCurrentScreen, selectActiveModal, closeModal } from '../../store/slices/navigation'
+import { audioPlayer, isMusicEnabled } from '../../services/audioPlayer'
 import { MainMenu } from '../../screens/MainMenu/index'
 import { About } from '../../screens/About'
 import { Contact } from '../../screens/Contact'
@@ -55,15 +55,14 @@ export const AppShell: FC = () => {
   const dispatch = useAppDispatch()
   const currentScreen = useAppSelector(selectCurrentScreen)
   const activeModal = useAppSelector(selectActiveModal)
-  const musicEnabled = useAppSelector(selectMusicEnabled)
+  const musicStarted = useRef(false)
 
   useEffect(() => {
-    if (musicEnabled) {
-      audioPlayer.start();
-    } else {
-      audioPlayer.stop();
-    }
-  }, [musicEnabled]);
+    if (musicStarted.current) return;
+    if (!isMusicEnabled()) return;
+    musicStarted.current = true;
+    audioPlayer.start();
+  }, [])
 
   const screenTransitions = useTransition(currentScreen, {
     from: { opacity: 0 },

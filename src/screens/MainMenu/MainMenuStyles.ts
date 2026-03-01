@@ -51,19 +51,27 @@ export const TitleLogo = styled.img`
   width: 75vw;
   max-width: 1100px;
   height: auto;
+  filter: url(#burn-reveal);
+  /* CSS masking applies AFTER filter effects (CSS Masking Level 1 spec),
+     so this clips the filter's output (incl. fire glow) to the logo's pixel shape */
+  mask-image: url(/title.png);
+  mask-size: 100% 100%;
 
   @media (max-width: 600px) {
     width: 90vw;
   }
 `;
 
-export const CardImage = styled.img`
+export const CardImage = styled.img<{ $src: string }>`
   position: absolute;
   width: 17vw;
   min-width: 150px;
   max-width: 240px;
   height: auto;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+  filter: url(#burn-reveal);
+  mask-image: url(${({ $src }) => $src});
+  mask-size: 100% 100%;
   pointer-events: auto;
   z-index: 2;
   cursor: grab;
@@ -319,9 +327,88 @@ export const SocialsRow = styled.div`
       height: 50px;
     }
 
-    /* music button (first) anchors left; remaining socials cluster right */
-    & > :first-child {
-      margin-right: auto;
-    }
+  }
+`;
+
+export const MusicButtonWrapper = styled.div`
+  position: relative;
+`;
+
+export const MusicSpeechBubble = styled.div<{ $clickable?: boolean }>`
+  position: absolute;
+  right: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  z-index: 20;
+  cursor: ${({ $clickable }) => ($clickable ? "pointer" : "default")};
+
+  @media (max-width: 600px) {
+    right: auto;
+    left: 50%;
+    top: auto;
+    bottom: calc(100% + 8px);
+    transform: translateX(-50%);
+    flex-direction: column;
+    align-items: center;
+  }
+`;
+
+export const MusicBubbleArrow = styled.div`
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 11px solid #f5f0e0;
+  flex-shrink: 0;
+
+  @media (max-width: 600px) {
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 11px solid #f5f0e0;
+    border-bottom: none;
+  }
+`;
+
+export const MusicBubbleBox = styled.div`
+  position: relative;
+  isolation: isolate;
+  padding: 10px 12px;
+  width: 170px;
+  filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.55));
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: #f5f0e0;
+    ${pixelatedClipPath(4)}
+    z-index: -1;
+  }
+
+  font-family: ${theme.font.family};
+  font-size: 0.85rem;
+  color: #2a2520;
+  line-height: 1.4;
+`;
+
+export const MusicBubbleDismiss = styled.button`
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: ${theme.font.family};
+  font-size: 1rem;
+  color: #2a2520;
+  padding: 0;
+  line-height: 1;
+  opacity: 0.6;
+
+  &:hover {
+    opacity: 1;
   }
 `;

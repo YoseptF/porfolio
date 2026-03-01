@@ -1,8 +1,8 @@
 import { type FC, useState, useEffect, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
 import { BalatroBackground } from "../../components/three/BalatroBackground";
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { openModal, selectMusicEnabled } from "../../store/slices/navigation";
+import { useAppDispatch } from "../../store/hooks";
+import { openModal } from "../../store/slices/navigation";
 import { useCardDrag } from "./useCardDrag";
 import {
   GitHubIcon,
@@ -31,9 +31,16 @@ import {
   JimboTooltipBubble,
   JimboTooltipText,
   TooltipWord,
+  MusicButtonWrapper,
+  MusicSpeechBubble,
+  MusicBubbleArrow,
+  MusicBubbleBox,
+  MusicBubbleDismiss,
 } from "./MainMenuStyles";
 import { DRAG_TAUNTS } from "../../constants";
 import { BalatroButton } from "../../components/ui/BalatroButton";
+import { isMusicEnabled, audioPlayer } from "../../services/audioPlayer";
+import { BurnRevealFilter } from "./BurnReveal";
 
 const isTouch = window.matchMedia("(pointer: coarse)").matches;
 const DEFAULT_TAUNT = { touch: "Hold and drag the card", mouse: "Click and drag the card" };
@@ -45,6 +52,7 @@ const cardTexture =
   personalCards[0];
 
 const VOICE_COUNT = 11;
+const isMusicActive = isMusicEnabled();
 
 const playVoice = () => {
   const n = Math.floor(Math.random() * VOICE_COUNT) + 1;
@@ -103,26 +111,30 @@ const useTypewriter = (text: string, active: boolean, seed: number) => {
 
 export const MainMenu: FC = () => {
   const dispatch = useAppDispatch();
-  const musicEnabled = useAppSelector(selectMusicEnabled);
   const { cardRef, onPointerDown, onPointerMove, onPointerUp } = useCardDrag();
   const tooltipText = isTouch ? taunt.touch : taunt.mouse;
   const [typewriterSeed, setTypewriterSeed] = useState(0);
   const { completedWords, inProgress } = useTypewriter(tooltipText, true, typewriterSeed);
 
-  // When music turns on mid-session (user just clicked "Let's go!"),
-  // audio is already unlocked — restart typewriter so voices play immediately.
-  const prevMusicEnabled = useRef(musicEnabled);
-  useEffect(() => {
-    if (musicEnabled && !prevMusicEnabled.current) {
-      setTypewriterSeed(s => s + 1);
-    }
-    prevMusicEnabled.current = musicEnabled;
-  }, [musicEnabled]);
+  const [bubbleDismissed, setBubbleDismissed] = useState(
+    () => localStorage.getItem("musicBubbleDismissed") === "true"
+  );
+  const [showAudioBlockedBubble, setShowAudioBlockedBubble] = useState(false);
 
-  // On hard page reload with musicEnabled=true, audio may be blocked until
-  // the user first interacts. Restart typewriter at that point so voices play.
+  // After 1s, if music is enabled but audio hasn't started (browser blocked autoplay),
+  // show the "browsers block music" speech bubble.
   useEffect(() => {
-    if (!musicEnabled) return;
+    if (!isMusicActive) return;
+    const timer = setTimeout(() => {
+      if (!audioPlayer.isPlaying()) setShowAudioBlockedBubble(true);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // When music is enabled, restart typewriter on first interaction so voices fire
+  // after the browser unblocks audio on that gesture.
+  useEffect(() => {
+    if (!isMusicActive) return;
     const restart = () => setTypewriterSeed(s => s + 1);
     document.addEventListener("click", restart, { once: true });
     document.addEventListener("keydown", restart, { once: true });
@@ -136,14 +148,31 @@ export const MainMenu: FC = () => {
   const prevCharCount = useRef(0);
   useEffect(() => {
     const count = completedWords.reduce((sum, w) => sum + w.length, 0) + inProgress.length;
-    if (musicEnabled && count > prevCharCount.current) {
+    if (isMusicActive && count > prevCharCount.current) {
       playVoice();
     }
     prevCharCount.current = count;
-  }, [completedWords, inProgress, musicEnabled]);
+  }, [completedWords, inProgress]);
+
+  const handleDismissBubble = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    localStorage.setItem("musicBubbleDismissed", "true");
+    setBubbleDismissed(true);
+  };
+
+  const handleAudioBlockedClick = () => {
+    audioPlayer.tryPlay();
+    setShowAudioBlockedBubble(false);
+    setTypewriterSeed(s => s + 1);
+  };
+
+  const showMusicBubble =
+    (isMusicActive && showAudioBlockedBubble) ||
+    (!isMusicActive && !bubbleDismissed);
 
   return (
     <Wrapper>
+      <BurnRevealFilter />
       <Canvas
         gl={{ antialias: false }}
         dpr={[1, 2]}
@@ -164,6 +193,7 @@ export const MainMenu: FC = () => {
           <CardImage
             ref={cardRef}
             src={`/jokers/${cardTexture}.png`}
+            $src={`/jokers/${cardTexture}.png`}
             alt="Personal card"
             onPointerDown={onPointerDown}
             onPointerMove={onPointerMove}
@@ -218,13 +248,33 @@ export const MainMenu: FC = () => {
         </ButtonsContainer>
 
         <SocialsRow>
-          <SocialIconButton
-            as="button"
-            $bgColor={musicEnabled ? "#27ae60" : "#c0392b"}
-            onClick={() => dispatch(openModal("music"))}
-          >
-            {musicEnabled ? <MusicOnIcon /> : <MusicOffIcon />}
-          </SocialIconButton>
+          <MusicButtonWrapper>
+            <SocialIconButton
+              as="button"
+              $bgColor={isMusicActive ? "#27ae60" : "#c0392b"}
+              onClick={() => dispatch(openModal("music"))}
+            >
+              {isMusicActive ? <MusicOnIcon /> : <MusicOffIcon />}
+            </SocialIconButton>
+            {showMusicBubble && (
+              isMusicActive ? (
+                <MusicSpeechBubble $clickable onClick={handleAudioBlockedClick}>
+                  <MusicBubbleBox>
+                    browsers block music — click here to enable it
+                  </MusicBubbleBox>
+                  <MusicBubbleArrow />
+                </MusicSpeechBubble>
+              ) : (
+                <MusicSpeechBubble>
+                  <MusicBubbleBox>
+                    this site is better with music I promise
+                    <MusicBubbleDismiss onClick={handleDismissBubble}>×</MusicBubbleDismiss>
+                  </MusicBubbleBox>
+                  <MusicBubbleArrow />
+                </MusicSpeechBubble>
+              )
+            )}
+          </MusicButtonWrapper>
           <SocialIconButton
             $bgColor="#1a1a1a"
             href="https://github.com/YoseptF"

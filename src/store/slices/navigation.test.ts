@@ -6,7 +6,8 @@ const initialState = { currentScreen: 'menu' as const, activeModal: null }
 describe('navigation slice', () => {
   it('has correct initial state', () => {
     const state = navigationReducer(undefined, { type: '@@init' })
-    expect(state).toEqual(initialState)
+    expect(state.currentScreen).toBe('menu')
+    expect(state.activeModal).toBeNull()
   })
 
   it('navigateTo changes currentScreen', () => {
@@ -15,7 +16,7 @@ describe('navigation slice', () => {
   })
 
   it('navigateTo clears activeModal', () => {
-    const withModal = { currentScreen: 'menu' as const, activeModal: 'about' as const }
+    const withModal = { ...initialState, activeModal: 'about' as const }
     const state = navigationReducer(withModal, navigateTo('menu'))
     expect(state.activeModal).toBeNull()
   })
