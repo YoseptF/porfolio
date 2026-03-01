@@ -1,12 +1,33 @@
 export const EXPERIENCE = new Date().getFullYear() - 2019 + "+";
-export const PROJECTS_URL = '/projects/index.json'
+export const PROJECTS_URL = "/projects/index.json";
 
 export const DRAG_TAUNTS: { touch: string; mouse: string }[] = [
-  { touch: "Drag me around with your finger. I dare ya.",   mouse: "Drag me around with your mouse. I dare ya." },
-  { touch: "Go on, pick me up. I won't bite.",              mouse: "Go on, drag me around. I won't bite." },
-  { touch: "Grab me. Toss me. I can take it.",              mouse: "Drag me. Toss me. I can take it." },
-  { touch: "Your finger. My face. Let's go.",               mouse: "Your cursor. My face. Let's go." },
-  { touch: "I'm just sitting here. Drag me somewhere.",     mouse: "I'm just sitting here. Drag me somewhere." },
-  { touch: "Pick me up and spin me around. Come on.",       mouse: "Grab me and spin me around. Come on." },
-  { touch: "I'm draggable. Don't leave me hanging.",        mouse: "I'm draggable. Don't leave me hanging." },
+  {
+    touch: "Try dragging me around! I dare ya.",
+    mouse: "Try dragging me around! I dare ya.",
+  },
+  {
+    touch: "Swipe me around. See what happens.",
+    mouse: "Click and drag me around. See what happens.",
+  },
+  {
+    touch: "I'm totally draggable. Yeet me across the screen!",
+    mouse: "I'm totally draggable. Yeet me across the screen!",
+  },
+  {
+    touch: "Wheeee! Er... I mean, professional dragging only.",
+    mouse: "Wheeee! Er... I mean, professional dragging only.",
+  },
+  {
+    touch: "I'm just sitting here. Grab me and take me for a spin.",
+    mouse: "I'm just sitting here. Click, hold, and take me for a spin.",
+  },
+  {
+    touch: "I'm completely draggable! Go ahead, grab and move me.",
+    mouse: "I'm completely draggable! Go ahead, click and drag me.",
+  },
+  {
+    touch: "Don't just stare—swipe to drag me anywhere!",
+    mouse: "Don't just stare—click and drag me anywhere!",
+  },
 ];

@@ -7,11 +7,13 @@ type Modal = 'about' | 'contact' | 'skills' | 'play' | 'music'
 interface NavigationState {
   currentScreen: Screen
   activeModal: Modal | null
+  musicEnabled: boolean
 }
 
 const initialState: NavigationState = {
   currentScreen: 'menu',
   activeModal: null,
+  musicEnabled: localStorage.getItem("musicEnabled") === "true",
 }
 
 const navigationSlice = createSlice({
@@ -28,11 +30,15 @@ const navigationSlice = createSlice({
     closeModal: (state) => {
       state.activeModal = null
     },
+    setMusicEnabled: (state, action: PayloadAction<boolean>) => {
+      state.musicEnabled = action.payload
+    },
   },
 })
 
-export const { navigateTo, openModal, closeModal } = navigationSlice.actions
+export const { navigateTo, openModal, closeModal, setMusicEnabled } = navigationSlice.actions
 export const navigationReducer = navigationSlice.reducer
 
 export const selectCurrentScreen = (state: RootState) => state.navigation.currentScreen
 export const selectActiveModal = (state: RootState) => state.navigation.activeModal
+export const selectMusicEnabled = (state: RootState) => state.navigation.musicEnabled

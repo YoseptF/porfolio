@@ -1,44 +1,47 @@
 import { type FC } from "react";
 import styled from "styled-components";
 import { BalatroButton } from "../components/ui/BalatroButton";
+import { BalatroPanel } from "../components/ui/BalatroPanel";
+import { BalatroText } from "../components/ui/BalatroText";
 import { ModalWrapper } from "../components/ui/ModalWrapper";
-import { useAppDispatch } from "../store/hooks";
-import { closeModal } from "../store/slices/navigation";
-import { theme } from "../styles/theme";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { closeModal, selectMusicEnabled, setMusicEnabled } from "../store/slices/navigation";
 
 const Content = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   gap: 24px;
-  padding: 40px 20px;
+  padding: 8px 0;
   text-align: center;
-`;
-
-const Message = styled.p`
-  font-family: ${theme.font.family};
-  font-size: 1.4rem;
-  color: ${theme.colors.text.white};
-  line-height: 1.6;
 `;
 
 export const Music: FC = () => {
   const dispatch = useAppDispatch();
+  const active = useAppSelector(selectMusicEnabled);
 
   const handleConfirm = () => {
-    localStorage.setItem("playMusic", "true");
-    window.location.reload();
+    if (active) {
+      localStorage.removeItem("musicEnabled");
+    } else {
+      localStorage.setItem("musicEnabled", "true");
+    }
+    dispatch(setMusicEnabled(!active));
+    dispatch(closeModal());
   };
 
   return (
-    <ModalWrapper onBack={() => dispatch(closeModal())} maxWidth="400px">
-      <Content>
-        <Message>The page will reload with music</Message>
-        <BalatroButton color="green" onClick={handleConfirm}>
-          Let&apos;s go!
-        </BalatroButton>
-      </Content>
+    <ModalWrapper onBack={() => dispatch(closeModal())} maxWidth="380px" fitContent>
+      <BalatroPanel title="MUSIC">
+        <Content>
+          <BalatroText variant="body">
+            {active ? "Turn off the music?" : "The page will start playing music"}
+          </BalatroText>
+          <BalatroButton color={active ? "red" : "green"} onClick={handleConfirm}>
+            {active ? "Turn off" : "Let\u2019s go!"}
+          </BalatroButton>
+        </Content>
+      </BalatroPanel>
     </ModalWrapper>
   );
 };

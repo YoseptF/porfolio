@@ -2,7 +2,8 @@ import { type FC, useEffect } from 'react'
 import { useTransition, animated } from '@react-spring/web'
 import styled from 'styled-components'
 import { useAppSelector, useAppDispatch } from '../../store/hooks'
-import { selectCurrentScreen, selectActiveModal, closeModal } from '../../store/slices/navigation'
+import { selectCurrentScreen, selectActiveModal, selectMusicEnabled, closeModal } from '../../store/slices/navigation'
+import { audioPlayer } from '../../services/audioPlayer'
 import { MainMenu } from '../../screens/MainMenu/index'
 import { About } from '../../screens/About'
 import { Contact } from '../../screens/Contact'
@@ -54,15 +55,15 @@ export const AppShell: FC = () => {
   const dispatch = useAppDispatch()
   const currentScreen = useAppSelector(selectCurrentScreen)
   const activeModal = useAppSelector(selectActiveModal)
+  const musicEnabled = useAppSelector(selectMusicEnabled)
 
   useEffect(() => {
-    if (localStorage.getItem("playMusic") !== "true") return;
-    localStorage.removeItem("playMusic");
-    const audio = new Audio("/music/theme.mp3");
-    audio.loop = true;
-    audio.volume = 0.5;
-    audio.play().catch(() => {});
-  }, []);
+    if (musicEnabled) {
+      audioPlayer.start();
+    } else {
+      audioPlayer.stop();
+    }
+  }, [musicEnabled]);
 
   const screenTransitions = useTransition(currentScreen, {
     from: { opacity: 0 },

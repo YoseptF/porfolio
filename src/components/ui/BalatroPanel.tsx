@@ -33,6 +33,9 @@ const TitleBar = styled.div`
 
 const Content = styled.div`
   padding: 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 `
 
 export const BalatroPanel: FC<BalatroPanelProps> = ({

@@ -1,12 +1,14 @@
-import { type FC, useState, useEffect } from "react";
+import { type FC, useState, useEffect, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
 import { BalatroBackground } from "../../components/three/BalatroBackground";
-import { useAppDispatch } from "../../store/hooks";
-import { openModal } from "../../store/slices/navigation";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { openModal, selectMusicEnabled } from "../../store/slices/navigation";
 import { useCardDrag } from "./useCardDrag";
 import {
   GitHubIcon,
   LinkedInIcon,
+  MusicOffIcon,
+  MusicOnIcon,
   ResumeIcon,
   SocialIconButton,
 } from "./SocialIcons";
@@ -30,17 +32,24 @@ import {
   JimboTooltipText,
   TooltipWord,
 } from "./MainMenuStyles";
-
 import { DRAG_TAUNTS } from "../../constants";
+import { BalatroButton } from "../../components/ui/BalatroButton";
 
 const isTouch = window.matchMedia("(pointer: coarse)").matches;
-const taunt = DRAG_TAUNTS[Math.floor(Math.random() * DRAG_TAUNTS.length)] ?? DRAG_TAUNTS[0];
-import { BalatroButton } from "../../components/ui/BalatroButton";
+const DEFAULT_TAUNT = { touch: "Hold and drag the card", mouse: "Click and drag the card" };
+const taunt = DRAG_TAUNTS[Math.floor(Math.random() * DRAG_TAUNTS.length)] ?? DEFAULT_TAUNT;
 
 const personalCards = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
 const cardTexture =
   personalCards[Math.floor(Math.random() * personalCards.length)] ??
   personalCards[0];
+
+const VOICE_COUNT = 11;
+
+const playVoice = () => {
+  const n = Math.floor(Math.random() * VOICE_COUNT) + 1;
+  new Audio(`/voice/voice${n}.mp3`).play().catch(() => {});
+};
 
 type TypewriterState = { completedWords: string[]; inProgress: string };
 
@@ -75,7 +84,7 @@ const buildTypewriterFrames = (text: string) => {
   return frames;
 };
 
-const useTypewriter = (text: string, active: boolean) => {
+const useTypewriter = (text: string, active: boolean, seed: number) => {
   const [state, setState] = useState<TypewriterState>({ completedWords: [], inProgress: "" });
 
   useEffect(() => {
@@ -87,16 +96,51 @@ const useTypewriter = (text: string, active: boolean) => {
     const frames = buildTypewriterFrames(text);
     const ids = frames.map(({ state: s, delay }) => setTimeout(() => setState(s), delay));
     return () => ids.forEach(clearTimeout);
-  }, [active, text]);
+  }, [active, text, seed]);
 
   return state;
 };
 
 export const MainMenu: FC = () => {
   const dispatch = useAppDispatch();
-  const { cardRef, onPointerDown, onPointerMove, onPointerUp, tooltipVisible } = useCardDrag();
+  const musicEnabled = useAppSelector(selectMusicEnabled);
+  const { cardRef, onPointerDown, onPointerMove, onPointerUp } = useCardDrag();
   const tooltipText = isTouch ? taunt.touch : taunt.mouse;
-  const { completedWords, inProgress } = useTypewriter(tooltipText, tooltipVisible);
+  const [typewriterSeed, setTypewriterSeed] = useState(0);
+  const { completedWords, inProgress } = useTypewriter(tooltipText, true, typewriterSeed);
+
+  // When music turns on mid-session (user just clicked "Let's go!"),
+  // audio is already unlocked — restart typewriter so voices play immediately.
+  const prevMusicEnabled = useRef(musicEnabled);
+  useEffect(() => {
+    if (musicEnabled && !prevMusicEnabled.current) {
+      setTypewriterSeed(s => s + 1);
+    }
+    prevMusicEnabled.current = musicEnabled;
+  }, [musicEnabled]);
+
+  // On hard page reload with musicEnabled=true, audio may be blocked until
+  // the user first interacts. Restart typewriter at that point so voices play.
+  useEffect(() => {
+    if (!musicEnabled) return;
+    const restart = () => setTypewriterSeed(s => s + 1);
+    document.addEventListener("click", restart, { once: true });
+    document.addEventListener("keydown", restart, { once: true });
+    return () => {
+      document.removeEventListener("click", restart);
+      document.removeEventListener("keydown", restart);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const prevCharCount = useRef(0);
+  useEffect(() => {
+    const count = completedWords.reduce((sum, w) => sum + w.length, 0) + inProgress.length;
+    if (musicEnabled && count > prevCharCount.current) {
+      playVoice();
+    }
+    prevCharCount.current = count;
+  }, [completedWords, inProgress, musicEnabled]);
 
   return (
     <Wrapper>
@@ -126,7 +170,7 @@ export const MainMenu: FC = () => {
             onPointerUp={onPointerUp}
             draggable={false}
           />
-          <JimboTooltipWrapper $visible={tooltipVisible}>
+          <JimboTooltipWrapper $visible={true}>
             <JimboTooltipArrow />
             <JimboTooltipBubble>
               <JimboTooltipText>
@@ -174,6 +218,13 @@ export const MainMenu: FC = () => {
         </ButtonsContainer>
 
         <SocialsRow>
+          <SocialIconButton
+            as="button"
+            $bgColor={musicEnabled ? "#27ae60" : "#c0392b"}
+            onClick={() => dispatch(openModal("music"))}
+          >
+            {musicEnabled ? <MusicOnIcon /> : <MusicOffIcon />}
+          </SocialIconButton>
           <SocialIconButton
             $bgColor="#1a1a1a"
             href="https://github.com/YoseptF"

@@ -41,22 +41,26 @@ describe('PlayModal', () => {
 
   it('next deck arrow cycles to second project', async () => {
     renderWithStore(<PlayModal />)
-    const nextButtons = screen.getAllByRole('button', { name: '>' })
-    await userEvent.click(nextButtons[0])
+    const [nextDeck] = screen.getAllByRole('button', { name: '>' })
+    if (!nextDeck) throw new Error('Expected next deck button')
+    await userEvent.click(nextDeck)
     expect(screen.getByText('SecondProject')).toBeInTheDocument()
   })
 
   it('prev deck arrow wraps to last project', async () => {
     renderWithStore(<PlayModal />)
-    const prevButtons = screen.getAllByRole('button', { name: '<' })
-    await userEvent.click(prevButtons[0])
+    const [prevDeck] = screen.getAllByRole('button', { name: '<' })
+    if (!prevDeck) throw new Error('Expected prev deck button')
+    await userEvent.click(prevDeck)
     expect(screen.getByText('SecondProject')).toBeInTheDocument()
   })
 
   it('next stakes arrow cycles tag', async () => {
     renderWithStore(<PlayModal />)
     const nextButtons = screen.getAllByRole('button', { name: '>' })
-    await userEvent.click(nextButtons[1])
+    const nextStakes = nextButtons[1]
+    if (!nextStakes) throw new Error('Expected next stakes button')
+    await userEvent.click(nextStakes)
     expect(screen.getByText('TypeScript')).toBeInTheDocument()
   })
 

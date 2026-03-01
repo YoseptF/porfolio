@@ -318,5 +318,10 @@ export const SocialsRow = styled.div`
       width: 50px;
       height: 50px;
     }
+
+    /* music button (first) anchors left; remaining socials cluster right */
+    & > :first-child {
+      margin-right: auto;
+    }
   }
 `;
