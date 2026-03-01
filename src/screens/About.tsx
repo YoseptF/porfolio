@@ -8,9 +8,6 @@ import { closeModal } from "../store/slices/navigation";
 import { theme } from "../styles/theme";
 import { EXPERIENCE } from "../constants";
 
-const TallPanel = styled(BalatroPanel)`
-  min-height: 65vh;
-`;
 
 const ProfileSection = styled.div`
   display: flex;
@@ -29,6 +26,11 @@ const ProfileImage = styled.img`
   height: 80px;
   border-radius: 8px;
   border: 2px solid ${theme.colors.panel.border};
+
+  @media (max-width: 600px) {
+    width: 56px;
+    height: 56px;
+  }
 `;
 
 const Bio = styled.div`
@@ -37,6 +39,14 @@ const Bio = styled.div`
   gap: 12px;
   margin-bottom: 24px;
   line-height: 1.7;
+
+  @media (max-width: 600px) {
+    gap: 8px;
+    margin-bottom: 12px;
+    & > *:nth-child(n+3) {
+      display: none;
+    }
+  }
 `;
 
 const StatsRow = styled.div`
@@ -47,6 +57,7 @@ const StatsRow = styled.div`
 
   @media (max-width: 600px) {
     justify-content: center;
+    gap: 8px;
   }
 `;
 
@@ -58,8 +69,8 @@ export const About: FC = () => {
   const dispatch = useAppDispatch();
 
   return (
-    <ModalWrapper onBack={() => dispatch(closeModal())} maxWidth="70vw">
-      <TallPanel title="ABOUT">
+    <ModalWrapper onBack={() => dispatch(closeModal())} maxWidth="min(900px, 92vw)">
+      <BalatroPanel title="ABOUT">
         <ProfileSection>
           <ProfileImage src="/cards/happy.png" alt="Joseph" />
           <div>
@@ -108,7 +119,7 @@ export const About: FC = () => {
             <BalatroText variant="body">Delivered</BalatroText>
           </StatItem>
         </StatsRow>
-      </TallPanel>
+      </BalatroPanel>
     </ModalWrapper>
   );
 };

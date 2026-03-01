@@ -33,13 +33,19 @@ const AnimatedScreen = styled(animated.div)`
 `
 
 const ModalBackdrop = styled.div`
-  position: absolute;
+  position: fixed;
   inset: 0;
   z-index: 10;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
+  overflow-y: auto;
+
+  @media (max-width: 600px) {
+    padding: 8px;
+    align-items: flex-start;
+  }
 `
 
 export const AppShell: FC = () => {
@@ -82,7 +88,7 @@ export const AppShell: FC = () => {
         if (!ModalComponent) return null
         return (
           <ModalBackdrop onClick={() => dispatch(closeModal())}>
-            <animated.div style={{ ...style, width: '100%' }} onClick={(e) => e.stopPropagation()}>
+            <animated.div style={{ ...style, width: '100%' }}>
               <ModalComponent />
             </animated.div>
           </ModalBackdrop>
