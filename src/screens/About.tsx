@@ -6,7 +6,7 @@ import { ModalWrapper } from "../components/ui/ModalWrapper";
 import { useAppDispatch } from "../store/hooks";
 import { closeModal } from "../store/slices/navigation";
 import { theme } from "../styles/theme";
-import { EXPETIENCE } from "../constants";
+import { EXPERIENCE } from "../constants";
 
 const TallPanel = styled(BalatroPanel)`
   min-height: 65vh;
@@ -71,27 +71,29 @@ export const About: FC = () => {
 
         <Bio>
           <BalatroText variant="body">
-            I've been building awesome frontend experiences with JavaScript and
-            React for {EXPETIENCE} years. It's my passion!
+            I've spent the last {EXPERIENCE} years translating complex ideas
+            into seamless React interfaces. Programming is much more than
+            writing code, it's a medium for expression.
           </BalatroText>
           <BalatroText variant="body">
-            My background in digital art and philosophy helps me approach coding
-            with a different perspective.
+            My dual background in digital arts and computer science means I
+            don't just ask how to build something, but why it matters to the
+            person on the other side of the screen.
           </BalatroText>
           <BalatroText variant="body">
-            Outside of my day job, I started and ran a successful freelance
-            group. Client communication and real-world problem-solving? I'm on
-            it.
+            Whether leading frontend teams or art collectives, I've learned that
+            the best products aren't built in a vacuum. They're the result of
+            clear communication and a deep focus on solving real human problems.
           </BalatroText>
           <BalatroText variant="body">
-            My goal is simple: create digital solutions that are beautiful,
-            intuitive, and work perfectly.
+            My goal is simple: create digital solutions that are technically
+            sound, visually compelling, and work perfectly.
           </BalatroText>
         </Bio>
 
         <StatsRow>
           <StatItem>
-            <BalatroText variant="chips">{EXPETIENCE}</BalatroText>
+            <BalatroText variant="chips">{EXPERIENCE}</BalatroText>
             <br />
             <BalatroText variant="body">Years</BalatroText>
           </StatItem>

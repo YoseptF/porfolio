@@ -1,1 +1,1 @@
-export const EXPETIENCE = new Date().getFullYear() - 2019 + "+";
+export const EXPERIENCE = new Date().getFullYear() - 2019 + "+";
