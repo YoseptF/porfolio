@@ -6,6 +6,7 @@ import { ModalWrapper } from "../components/ui/ModalWrapper";
 import { useAppDispatch } from "../store/hooks";
 import { closeModal } from "../store/slices/navigation";
 import { theme } from "../styles/theme";
+import { EXPETIENCE } from "../constants";
 
 const TallPanel = styled(BalatroPanel)`
   min-height: 65vh;
@@ -71,7 +72,7 @@ export const About: FC = () => {
         <Bio>
           <BalatroText variant="body">
             I've been building awesome frontend experiences with JavaScript and
-            React for 8+ years. It's my passion!
+            React for {EXPETIENCE} years. It's my passion!
           </BalatroText>
           <BalatroText variant="body">
             My background in digital art and philosophy helps me approach coding
@@ -90,7 +91,7 @@ export const About: FC = () => {
 
         <StatsRow>
           <StatItem>
-            <BalatroText variant="chips">6+</BalatroText>
+            <BalatroText variant="chips">{EXPETIENCE}</BalatroText>
             <br />
             <BalatroText variant="body">Years</BalatroText>
           </StatItem>
