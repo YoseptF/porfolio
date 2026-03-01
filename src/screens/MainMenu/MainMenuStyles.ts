@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { theme, pixelatedClipPath, shadows } from "../../styles/theme";
 import {
   BalatroButton,
@@ -280,6 +280,17 @@ export const JimboTooltipText = styled.p`
     text-align: center;
     font-size: 0.9rem;
   }
+`;
+
+const wordPop = keyframes`
+  0%   { transform: translateY(5px) scale(0.8); opacity: 0; }
+  55%  { transform: translateY(-3px) scale(1.08); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+`;
+
+export const TooltipWord = styled.span`
+  display: inline-block;
+  animation: ${wordPop} 220ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
 `;
 
 export const SocialsRow = styled.div`

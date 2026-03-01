@@ -1,4 +1,4 @@
-import { type FC } from "react";
+import { type FC, useState, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 import { BalatroBackground } from "../../components/three/BalatroBackground";
 import { useAppDispatch } from "../../store/hooks";
@@ -28,9 +28,13 @@ import {
   JimboTooltipArrow,
   JimboTooltipBubble,
   JimboTooltipText,
+  TooltipWord,
 } from "./MainMenuStyles";
 
+import { DRAG_TAUNTS } from "../../constants";
+
 const isTouch = window.matchMedia("(pointer: coarse)").matches;
+const taunt = DRAG_TAUNTS[Math.floor(Math.random() * DRAG_TAUNTS.length)] ?? DRAG_TAUNTS[0];
 import { BalatroButton } from "../../components/ui/BalatroButton";
 
 const personalCards = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
@@ -38,9 +42,61 @@ const cardTexture =
   personalCards[Math.floor(Math.random() * personalCards.length)] ??
   personalCards[0];
 
+type TypewriterState = { completedWords: string[]; inProgress: string };
+
+const buildTypewriterFrames = (text: string) => {
+  const frames: { state: TypewriterState; delay: number }[] = [];
+  const done: string[] = [];
+  let word = "";
+  let elapsed = 0;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i] ?? "";
+    const isSpace = char === " ";
+    const isLast = i === text.length - 1;
+
+    elapsed += 65;
+
+    if (isSpace) {
+      done.push(word);
+      word = "";
+      frames.push({ state: { completedWords: [...done], inProgress: "" }, delay: elapsed });
+    } else {
+      word += char;
+      if (isLast) {
+        done.push(word);
+        frames.push({ state: { completedWords: [...done], inProgress: "" }, delay: elapsed });
+      } else {
+        frames.push({ state: { completedWords: [...done], inProgress: word }, delay: elapsed });
+      }
+    }
+  }
+
+  return frames;
+};
+
+const useTypewriter = (text: string, active: boolean) => {
+  const [state, setState] = useState<TypewriterState>({ completedWords: [], inProgress: "" });
+
+  useEffect(() => {
+    if (!active) {
+      setState({ completedWords: [], inProgress: "" });
+      return;
+    }
+    setState({ completedWords: [], inProgress: "" });
+    const frames = buildTypewriterFrames(text);
+    const ids = frames.map(({ state: s, delay }) => setTimeout(() => setState(s), delay));
+    return () => ids.forEach(clearTimeout);
+  }, [active, text]);
+
+  return state;
+};
+
 export const MainMenu: FC = () => {
   const dispatch = useAppDispatch();
   const { cardRef, onPointerDown, onPointerMove, onPointerUp, tooltipVisible } = useCardDrag();
+  const tooltipText = isTouch ? taunt.touch : taunt.mouse;
+  const { completedWords, inProgress } = useTypewriter(tooltipText, tooltipVisible);
 
   return (
     <Wrapper>
@@ -74,9 +130,10 @@ export const MainMenu: FC = () => {
             <JimboTooltipArrow />
             <JimboTooltipBubble>
               <JimboTooltipText>
-                {isTouch
-                  ? "Drag me around with your finger. I dare ya."
-                  : "Drag me around with your mouse. I dare ya."}
+                {completedWords.map((word, i) => (
+                  <span key={i}><TooltipWord>{word}</TooltipWord>{" "}</span>
+                ))}
+                {inProgress}
               </JimboTooltipText>
             </JimboTooltipBubble>
           </JimboTooltipWrapper>
