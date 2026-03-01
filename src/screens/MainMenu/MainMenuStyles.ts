@@ -212,6 +212,76 @@ export const MenuButton = styled(BalatroButton)`
   }
 `;
 
+export const JimboTooltipWrapper = styled.div<{ $visible: boolean }>`
+  position: absolute;
+  left: calc(50% + 134px);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  z-index: 10;
+  opacity: ${({ $visible }) => ($visible ? 1 : 0)};
+  transition: opacity 0.5s ease;
+
+  @media (orientation: portrait) {
+    left: 50%;
+    top: calc(50% + 21vw + 10px);
+    transform: translateX(-50%);
+    flex-direction: column;
+  }
+`;
+
+export const JimboTooltipArrow = styled.div`
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-right: 13px solid #f5f0e0;
+  flex-shrink: 0;
+
+  @media (orientation: portrait) {
+    border-right: 10px solid transparent;
+    border-left: 10px solid transparent;
+    border-bottom: 13px solid #f5f0e0;
+    border-top: none;
+  }
+`;
+
+export const JimboTooltipBubble = styled.div`
+  position: relative;
+  isolation: isolate;
+  padding: 12px 14px;
+  width: 190px;
+  filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.55));
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: #f5f0e0;
+    ${pixelatedClipPath(4)}
+    z-index: -1;
+  }
+
+  @media (orientation: portrait) {
+    width: 200px;
+  }
+`;
+
+export const JimboTooltipText = styled.p`
+  font-family: ${theme.font.family};
+  font-size: 1.1rem;
+  color: #2a2520;
+  margin: 0;
+  line-height: 1.45;
+
+  @media (orientation: portrait) {
+    text-align: center;
+    font-size: 0.9rem;
+  }
+`;
+
 export const SocialsRow = styled.div`
   display: flex;
   flex-direction: column;

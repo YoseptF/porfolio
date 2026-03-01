@@ -24,7 +24,13 @@ import {
   PlayButton,
   MenuButton,
   SocialsRow,
+  JimboTooltipWrapper,
+  JimboTooltipArrow,
+  JimboTooltipBubble,
+  JimboTooltipText,
 } from "./MainMenuStyles";
+
+const isTouch = window.matchMedia("(pointer: coarse)").matches;
 import { BalatroButton } from "../../components/ui/BalatroButton";
 
 const personalCards = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
@@ -34,7 +40,7 @@ const cardTexture =
 
 export const MainMenu: FC = () => {
   const dispatch = useAppDispatch();
-  const { cardRef, onPointerDown, onPointerMove, onPointerUp } = useCardDrag();
+  const { cardRef, onPointerDown, onPointerMove, onPointerUp, tooltipVisible } = useCardDrag();
 
   return (
     <Wrapper>
@@ -64,6 +70,16 @@ export const MainMenu: FC = () => {
             onPointerUp={onPointerUp}
             draggable={false}
           />
+          <JimboTooltipWrapper $visible={tooltipVisible}>
+            <JimboTooltipArrow />
+            <JimboTooltipBubble>
+              <JimboTooltipText>
+                {isTouch
+                  ? "Drag me around with your finger. I dare ya."
+                  : "Drag me around with your mouse. I dare ya."}
+              </JimboTooltipText>
+            </JimboTooltipBubble>
+          </JimboTooltipWrapper>
         </TitleCardWrapper>
       </TitleCardArea>
 

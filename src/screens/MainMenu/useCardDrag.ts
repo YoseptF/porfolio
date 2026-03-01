@@ -1,9 +1,13 @@
-import { useRef, useCallback, useEffect } from 'react'
+import { useRef, useCallback, useEffect, useState } from 'react'
+
+const JIMBO_HINT_KEY = 'jimbo-hint-seen'
 
 export const useCardDrag = () => {
   const cardRef = useRef<HTMLImageElement>(null)
   const animFrame = useRef(0)
   const startTime = useRef(0)
+  const tooltipDismissed = useRef(!!localStorage.getItem(JIMBO_HINT_KEY))
+  const [tooltipVisible, setTooltipVisible] = useState(!tooltipDismissed.current)
   const dragState = useRef({
     dragging: false,
     offsetX: 0,
@@ -48,8 +52,16 @@ export const useCardDrag = () => {
     dragState.current.offsetY = e.clientY - centerY - dragState.current.y
   }, [])
 
+  const dismissTooltip = useCallback(() => {
+    if (tooltipDismissed.current) return
+    tooltipDismissed.current = true
+    localStorage.setItem(JIMBO_HINT_KEY, '1')
+    setTooltipVisible(false)
+  }, [])
+
   const onPointerMove = useCallback((e: React.PointerEvent<HTMLImageElement>) => {
     if (!dragState.current.dragging || !cardRef.current) return
+    dismissTooltip()
 
     const rect = cardRef.current.parentElement?.getBoundingClientRect()
     if (!rect) return
@@ -65,5 +77,5 @@ export const useCardDrag = () => {
     dragState.current.dragging = false
   }, [])
 
-  return { cardRef, onPointerDown, onPointerMove, onPointerUp }
+  return { cardRef, onPointerDown, onPointerMove, onPointerUp, tooltipVisible }
 }
