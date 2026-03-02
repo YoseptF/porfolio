@@ -392,6 +392,12 @@ export const MusicBubbleBox = styled.div`
   font-size: 0.85rem;
   color: #2a2520;
   line-height: 1.4;
+
+  @media (min-width: 601px) {
+    width: 340px;
+    padding: 20px 24px;
+    font-size: 1.7rem;
+  }
 `;
 
 export const MusicBubbleDismiss = styled.button`

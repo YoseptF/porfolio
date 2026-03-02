@@ -22,36 +22,71 @@ export const Music: FC = () => {
   const active = isMusicEnabled();
   const blocked = active && !audioPlayer.isPlaying();
 
+  const handleEnableWithIntro = () => {
+    localStorage.setItem("musicEnabled", "true");
+    localStorage.setItem("replayIntro", "true");
+    window.location.reload();
+  };
+
+  const handleDisable = () => {
+    localStorage.removeItem("musicEnabled");
+    window.location.reload();
+  };
+
   const handleReplayIntro = () => {
     localStorage.setItem("replayIntro", "true");
     window.location.reload();
   };
 
-  const handlePrimary = () => {
-    if (active && !blocked) {
-      localStorage.removeItem("musicEnabled");
-    } else if (!active) {
-      localStorage.setItem("musicEnabled", "true");
-    }
+  if (!active) {
+    return (
+      <ModalWrapper onBack={() => dispatch(closeModal())} maxWidth="380px" fitContent>
+        <BalatroPanel title="MUSIC">
+          <Content>
+            <BalatroText variant="body">The page will start playing music</BalatroText>
+            <BalatroButton color="green" onClick={handleEnableWithIntro}>
+              Let&apos;s go!
+            </BalatroButton>
+          </Content>
+        </BalatroPanel>
+      </ModalWrapper>
+    );
+  }
+
+  const handleBlockedReplayIntro = () => {
+    audioPlayer.tryPlay();
+    localStorage.setItem("replayIntro", "true");
     window.location.reload();
   };
 
-  const bodyText = active && !blocked
-    ? "Turn off the music?"
-    : blocked
-      ? "Browser blocked the music — click to enable it now"
-      : "The page will start playing music";
-
-  const primaryColor = active && !blocked ? "red" : "green";
-  const primaryLabel = active && !blocked ? "Turn off" : "Let\u2019s go!";
+  if (blocked) {
+    return (
+      <ModalWrapper onBack={() => dispatch(closeModal())} maxWidth="380px" fitContent>
+        <BalatroPanel title="MUSIC">
+          <Content>
+            <BalatroText variant="body">Browser blocked the music — click to enable it now</BalatroText>
+            <BalatroButton color="green" onClick={() => { audioPlayer.tryPlay(); dispatch(closeModal()); }}>
+              Let&apos;s go!
+            </BalatroButton>
+            <BalatroButton color="blue" onClick={handleBlockedReplayIntro}>
+              Replay intro
+            </BalatroButton>
+            <BalatroButton color="red" onClick={handleDisable}>
+              Turn off
+            </BalatroButton>
+          </Content>
+        </BalatroPanel>
+      </ModalWrapper>
+    );
+  }
 
   return (
     <ModalWrapper onBack={() => dispatch(closeModal())} maxWidth="380px" fitContent>
       <BalatroPanel title="MUSIC">
         <Content>
-          <BalatroText variant="body">{bodyText}</BalatroText>
-          <BalatroButton color={primaryColor} onClick={handlePrimary}>
-            {primaryLabel}
+          <BalatroText variant="body">Turn off the music?</BalatroText>
+          <BalatroButton color="red" onClick={handleDisable}>
+            Turn off
           </BalatroButton>
           <BalatroButton color="blue" onClick={handleReplayIntro}>
             Replay intro

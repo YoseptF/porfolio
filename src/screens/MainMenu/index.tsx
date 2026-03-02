@@ -45,10 +45,27 @@ import { IntroSequence } from "./IntroSequence";
 import { DebugSwirl } from "./DebugSwirl";
 
 const isTouch = window.matchMedia("(pointer: coarse)").matches;
-const DEFAULT_TAUNT = { touch: "Hold and drag the card", mouse: "Click and drag the card" };
-const taunt = DRAG_TAUNTS[Math.floor(Math.random() * DRAG_TAUNTS.length)] ?? DEFAULT_TAUNT;
+const DEFAULT_TAUNT = {
+  touch: "Hold and drag the card",
+  mouse: "Click and drag the card",
+};
+const taunt =
+  DRAG_TAUNTS[Math.floor(Math.random() * DRAG_TAUNTS.length)] ?? DEFAULT_TAUNT;
 
-const personalCards = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
+const personalCards = [
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "11",
+  "12",
+];
 const cardTexture =
   personalCards[Math.floor(Math.random() * personalCards.length)] ?? "1";
 
@@ -78,14 +95,23 @@ const buildTypewriterFrames = (text: string) => {
     if (isSpace) {
       done.push(word);
       word = "";
-      frames.push({ state: { completedWords: [...done], inProgress: "" }, delay: elapsed });
+      frames.push({
+        state: { completedWords: [...done], inProgress: "" },
+        delay: elapsed,
+      });
     } else {
       word += char;
       if (isLast) {
         done.push(word);
-        frames.push({ state: { completedWords: [...done], inProgress: "" }, delay: elapsed });
+        frames.push({
+          state: { completedWords: [...done], inProgress: "" },
+          delay: elapsed,
+        });
       } else {
-        frames.push({ state: { completedWords: [...done], inProgress: word }, delay: elapsed });
+        frames.push({
+          state: { completedWords: [...done], inProgress: word },
+          delay: elapsed,
+        });
       }
     }
   }
@@ -94,7 +120,10 @@ const buildTypewriterFrames = (text: string) => {
 };
 
 const useTypewriter = (text: string, active: boolean, seed: number) => {
-  const [state, setState] = useState<TypewriterState>({ completedWords: [], inProgress: "" });
+  const [state, setState] = useState<TypewriterState>({
+    completedWords: [],
+    inProgress: "",
+  });
 
   useEffect(() => {
     if (!active) {
@@ -103,49 +132,64 @@ const useTypewriter = (text: string, active: boolean, seed: number) => {
     }
     setState({ completedWords: [], inProgress: "" });
     const frames = buildTypewriterFrames(text);
-    const ids = frames.map(({ state: s, delay }) => setTimeout(() => setState(s), delay));
+    const ids = frames.map(({ state: s, delay }) =>
+      setTimeout(() => setState(s), delay),
+    );
     return () => ids.forEach(clearTimeout);
   }, [active, text, seed]);
 
   return state;
 };
 
-const isDebugSwirl = new URLSearchParams(window.location.search).has('debugSwirl');
+const isDebugSwirl = new URLSearchParams(window.location.search).has(
+  "debugSwirl",
+);
 
-const shouldPlayIntro = () =>
-  !localStorage.getItem('introPlayed') ||
-  localStorage.getItem('replayIntro') === 'true';
+export const shouldPlayIntro = () =>
+  !localStorage.getItem("introPlayed") ||
+  localStorage.getItem("replayIntro") === "true";
 
 export const MainMenu: FC = () => {
   const dispatch = useAppDispatch();
-  const { cardRef, onPointerDown, onPointerMove, onPointerUp, hasDragged } = useCardDrag();
+  const { cardRef, onPointerDown, onPointerMove, onPointerUp, hasDragged } =
+    useCardDrag();
   const tooltipText = isTouch ? taunt.touch : taunt.mouse;
 
   const [introActive, setIntroActive] = useState(() => shouldPlayIntro());
   const [burnInActive, setBurnInActive] = useState(() => !shouldPlayIntro());
 
   const [bubbleDismissed, setBubbleDismissed] = useState(
-    () => localStorage.getItem("musicBubbleDismissed") === "true"
+    () => localStorage.getItem("musicBubbleDismissed") === "true",
   );
   const [showAudioBlockedBubble, setShowAudioBlockedBubble] = useState(false);
   const [cardBurnDone, setCardBurnDone] = useState(false);
 
-  const { completedWords, inProgress } = useTypewriter(tooltipText, cardBurnDone, 0);
+  const { completedWords, inProgress } = useTypewriter(
+    tooltipText,
+    cardBurnDone,
+    0,
+  );
 
-  // After 1s, if music is enabled but audio hasn't started (browser blocked autoplay),
+  // After 1s post-intro, if music is enabled but audio hasn't started (browser blocked autoplay),
   // show the "browsers block music" speech bubble.
   useEffect(() => {
     if (!isMusicActive) return;
+    if (introActive) return;
     const timer = setTimeout(() => {
       if (!audioPlayer.isPlaying()) setShowAudioBlockedBubble(true);
     }, 1000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [introActive]);
 
   const prevCharCount = useRef(0);
   useEffect(() => {
-    const count = completedWords.reduce((sum, w) => sum + w.length, 0) + inProgress.length;
-    if (isMusicActive && audioPlayer.isPlaying() && count > prevCharCount.current) {
+    const count =
+      completedWords.reduce((sum, w) => sum + w.length, 0) + inProgress.length;
+    if (
+      isMusicActive &&
+      audioPlayer.isPlaying() &&
+      count > prevCharCount.current
+    ) {
       playVoice();
     }
     prevCharCount.current = count;
@@ -168,11 +212,17 @@ export const MainMenu: FC = () => {
       {introActive && (
         <IntroSequence
           cardTexture={cardTexture}
-          onRevealStart={() => setTimeout(() => setBurnInActive(true), BURN_IN_AFTER_INTRO_DELAY_MS)}
+          onRevealStart={() =>
+            setTimeout(
+              () => setBurnInActive(true),
+              BURN_IN_AFTER_INTRO_DELAY_MS,
+            )
+          }
           onComplete={() => {
             setIntroActive(false);
-            localStorage.setItem('introPlayed', 'true');
-            localStorage.removeItem('replayIntro');
+            localStorage.setItem("introPlayed", "true");
+            localStorage.removeItem("replayIntro");
+            if (isMusicEnabled()) audioPlayer.start();
           }}
         />
       )}
@@ -213,7 +263,9 @@ export const MainMenu: FC = () => {
             <JimboTooltipBubble>
               <JimboTooltipText>
                 {completedWords.map((word, i) => (
-                  <span key={i}><TooltipWord>{word}</TooltipWord>{" "}</span>
+                  <span key={i}>
+                    <TooltipWord>{word}</TooltipWord>{" "}
+                  </span>
                 ))}
                 {inProgress}
               </JimboTooltipText>
@@ -225,14 +277,18 @@ export const MainMenu: FC = () => {
       <BottomArea>
         <ProfileContainer>
           <ProfileLabel>Profile</ProfileLabel>
-          <BalatroButton color="grey" href="/docs/josephFloresATS.pdf" target="_blank" rel="noopener noreferrer">Joseph</BalatroButton>
+          <BalatroButton
+            color="grey"
+            href="/docs/josephFloresATS.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Joseph
+          </BalatroButton>
         </ProfileContainer>
 
         <ButtonsContainer>
-          <PlayButton
-            color="blue"
-            onClick={() => dispatch(openModal("play"))}
-          >
+          <PlayButton color="blue" onClick={() => dispatch(openModal("play"))}>
             Play
           </PlayButton>
           <MenuButton
@@ -264,8 +320,8 @@ export const MainMenu: FC = () => {
             >
               {isMusicActive ? <MusicOnIcon /> : <MusicOffIcon />}
             </SocialIconButton>
-            {showMusicBubble && (
-              isMusicActive ? (
+            {showMusicBubble &&
+              (isMusicActive ? (
                 <MusicSpeechBubble>
                   <MusicBubbleBox>
                     browsers block music — click the button to enable it
@@ -275,13 +331,24 @@ export const MainMenu: FC = () => {
               ) : (
                 <MusicSpeechBubble>
                   <MusicBubbleBox>
-                    this site is better with music I promise
-                    <MusicBubbleDismiss onClick={handleDismissBubble}>×</MusicBubbleDismiss>
+                    this site is{" "}
+                    <strong
+                      style={{
+                        color: "red",
+                        fontWeight: 500,
+                        fontSize: "1.8rem",
+                      }}
+                    >
+                      way
+                    </strong>{" "}
+                    better with music I promise
+                    <MusicBubbleDismiss onClick={handleDismissBubble}>
+                      ×
+                    </MusicBubbleDismiss>
                   </MusicBubbleBox>
                   <MusicBubbleArrow />
                 </MusicSpeechBubble>
-              )
-            )}
+              ))}
           </MusicButtonWrapper>
           <SocialIconButton
             $bgColor="#1a1a1a"

@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { useAppSelector, useAppDispatch } from '../../store/hooks'
 import { selectCurrentScreen, selectActiveModal, closeModal } from '../../store/slices/navigation'
 import { audioPlayer, isMusicEnabled } from '../../services/audioPlayer'
-import { MainMenu } from '../../screens/MainMenu/index'
+import { MainMenu, shouldPlayIntro } from '../../screens/MainMenu/index'
 import { About } from '../../screens/About'
 import { Contact } from '../../screens/Contact'
 import { Skills } from '../../screens/Skills'
@@ -60,6 +60,7 @@ export const AppShell: FC = () => {
   useEffect(() => {
     if (musicStarted.current) return;
     if (!isMusicEnabled()) return;
+    if (shouldPlayIntro()) return; // MainMenu onComplete will start music after the white flash
     musicStarted.current = true;
     audioPlayer.start();
   }, [])

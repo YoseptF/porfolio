@@ -5,6 +5,8 @@ import { BalatroBackground } from "../../components/three/BalatroBackground";
 import { SwirlCards } from "../../components/three/SwirlCards";
 import { BurnOutFilter } from "./BurnReveal";
 import { theme } from "../../styles/theme";
+import { BURN_CARD_OUT_DURATION_MS } from "../../constants";
+import { isMusicEnabled } from "../../services/audioPlayer";
 
 interface IntroSequenceProps {
   onRevealStart: () => void;
@@ -81,6 +83,8 @@ export const IntroSequence: FC<IntroSequenceProps> = ({
   const [flashProgress, setFlashProgress] = useState(0);
   const [revealOpacity, setRevealOpacity] = useState(1);
   const [skipClicks, setSkipClicks] = useState(0);
+  const [introDuration, setIntroDuration] = useState<number | null>(null);
+  const introAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const onRevealStartRef = useRef(onRevealStart);
   onRevealStartRef.current = onRevealStart;
@@ -90,7 +94,29 @@ export const IntroSequence: FC<IntroSequenceProps> = ({
   const phaseRef = useRef<Phase>("burn-out");
   phaseRef.current = phase;
 
+  useEffect(() => {
+    const audio = new Audio('/music/initial_intro_sound.mp3');
+    introAudioRef.current = audio;
+
+    const fallback = setTimeout(() => {
+      setIntroDuration(BURN_CARD_OUT_DURATION_MS);
+    }, 2000);
+
+    audio.addEventListener('loadedmetadata', () => {
+      clearTimeout(fallback);
+      const burnOutMs = Math.max(audio.duration * 1000 - 800 - 700, 1000);
+      setIntroDuration(burnOutMs);
+      if (isMusicEnabled()) audio.play().catch(() => {});
+    });
+
+    return () => {
+      clearTimeout(fallback);
+      audio.pause();
+    };
+  }, []);
+
   const doSkip = useCallback(() => {
+    introAudioRef.current?.pause();
     onRevealStartRef.current();
     onCompleteRef.current();
   }, []);
@@ -194,7 +220,8 @@ export const IntroSequence: FC<IntroSequenceProps> = ({
   return (
     <Overlay onClick={handleClick} style={{ opacity: overlayOpacity, transition: phase === 'reveal' ? 'opacity 0.65s ease-out' : 'none' }}>
       <BurnOutFilter
-        active={phase === "burn-out"}
+        active={phase === "burn-out" && introDuration !== null}
+        durationMs={introDuration ?? BURN_CARD_OUT_DURATION_MS}
         onProgress={setBurnProgress}
         onComplete={() => setPhase("white-flash")}
       />

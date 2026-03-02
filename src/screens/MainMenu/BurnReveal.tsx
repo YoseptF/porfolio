@@ -169,11 +169,12 @@ export const BurnOutFilter: FC<{
   onComplete?: () => void;
   onProgress?: (progress: number) => void;
   active: boolean;
-}> = ({ onComplete, onProgress, active }) => {
+  durationMs?: number;
+}> = ({ onComplete, onProgress, active, durationMs = BURN_CARD_OUT_DURATION_MS }) => {
   const mainRef = useRef<SVGFEColorMatrixElement>(null);
   const edgeRef = useRef<SVGFEColorMatrixElement>(null);
 
-  useBurnOutAnimation(mainRef, edgeRef, BURN_CARD_OUT_DURATION_MS, active, onComplete, onProgress);
+  useBurnOutAnimation(mainRef, edgeRef, durationMs, active, onComplete, onProgress);
 
   return (
     <svg
