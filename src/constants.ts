@@ -3,6 +3,18 @@ export const PROJECTS_URL = "/projects/index.json";
 
 export const BURN_TITLE_DURATION_MS = 2200;
 export const BURN_CARD_DURATION_MS = 4800;
+export const BURN_CARD_OUT_DURATION_MS = 9600;
+
+export const SWIRL_CARD_COUNT = 43;
+export const SWIRL_JOKER_COUNT = 12;
+export const SWIRL_Z_START = 4.2;
+export const SWIRL_Z_END = -15.0;
+export const SWIRL_XY_RADIUS = 9.0;
+export const SWIRL_TURNS = 1.8;
+export const SWIRL_SPEED_BASE = 0.12;
+export const SWIRL_SPEED_VARIANCE = 0.11;
+export const SWIRL_CARD_WIDTH = 1.2;
+export const SWIRL_CARD_HEIGHT = 1.68;
 
 export const DRAG_TAUNTS: { touch: string; mouse: string }[] = [
   {

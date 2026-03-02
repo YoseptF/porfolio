@@ -41,6 +41,8 @@ import { DRAG_TAUNTS } from "../../constants";
 import { BalatroButton } from "../../components/ui/BalatroButton";
 import { isMusicEnabled, audioPlayer } from "../../services/audioPlayer";
 import { BurnRevealFilter } from "./BurnReveal";
+import { IntroSequence } from "./IntroSequence";
+import { DebugSwirl } from "./DebugSwirl";
 
 const isTouch = window.matchMedia("(pointer: coarse)").matches;
 const DEFAULT_TAUNT = { touch: "Hold and drag the card", mouse: "Click and drag the card" };
@@ -48,8 +50,7 @@ const taunt = DRAG_TAUNTS[Math.floor(Math.random() * DRAG_TAUNTS.length)] ?? DEF
 
 const personalCards = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
 const cardTexture =
-  personalCards[Math.floor(Math.random() * personalCards.length)] ??
-  personalCards[0];
+  personalCards[Math.floor(Math.random() * personalCards.length)] ?? "1";
 
 const VOICE_COUNT = 11;
 const isMusicActive = isMusicEnabled();
@@ -109,10 +110,19 @@ const useTypewriter = (text: string, active: boolean, seed: number) => {
   return state;
 };
 
+const isDebugSwirl = new URLSearchParams(window.location.search).has('debugSwirl');
+
+const shouldPlayIntro = () =>
+  !localStorage.getItem('introPlayed') ||
+  localStorage.getItem('replayIntro') === 'true';
+
 export const MainMenu: FC = () => {
   const dispatch = useAppDispatch();
   const { cardRef, onPointerDown, onPointerMove, onPointerUp, hasDragged } = useCardDrag();
   const tooltipText = isTouch ? taunt.touch : taunt.mouse;
+
+  const [introActive, setIntroActive] = useState(() => shouldPlayIntro());
+  const [burnInActive, setBurnInActive] = useState(() => !shouldPlayIntro());
 
   const [bubbleDismissed, setBubbleDismissed] = useState(
     () => localStorage.getItem("musicBubbleDismissed") === "true"
@@ -121,7 +131,6 @@ export const MainMenu: FC = () => {
   const [cardBurnDone, setCardBurnDone] = useState(false);
 
   const { completedWords, inProgress } = useTypewriter(tooltipText, cardBurnDone, 0);
-
 
   // After 1s, if music is enabled but audio hasn't started (browser blocked autoplay),
   // show the "browsers block music" speech bubble.
@@ -152,9 +161,26 @@ export const MainMenu: FC = () => {
     (isMusicActive && showAudioBlockedBubble) ||
     (!isMusicActive && !bubbleDismissed);
 
+  if (isDebugSwirl) return <DebugSwirl />;
+
   return (
     <Wrapper>
-      <BurnRevealFilter onCardComplete={() => setCardBurnDone(true)} />
+      {introActive && (
+        <IntroSequence
+          cardTexture={cardTexture}
+          onRevealStart={() => setBurnInActive(true)}
+          onComplete={() => {
+            setIntroActive(false);
+            localStorage.setItem('introPlayed', 'true');
+            localStorage.removeItem('replayIntro');
+          }}
+        />
+      )}
+
+      <BurnRevealFilter
+        active={burnInActive}
+        onCardComplete={() => setCardBurnDone(true)}
+      />
       <Canvas
         gl={{ antialias: false }}
         dpr={[1, 2]}

@@ -12,7 +12,7 @@ const Content = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
+  gap: 16px;
   padding: 8px 0;
   text-align: center;
 `;
@@ -20,36 +20,41 @@ const Content = styled.div`
 export const Music: FC = () => {
   const dispatch = useAppDispatch();
   const active = isMusicEnabled();
-  // Music is enabled in localStorage but audio was blocked by the browser
   const blocked = active && !audioPlayer.isPlaying();
 
-  const handleConfirm = () => {
-    if (active && !blocked) {
-      localStorage.removeItem("musicEnabled");
-      window.location.reload();
-    } else if (blocked) {
-      window.location.reload();
-    } else {
-      localStorage.setItem("musicEnabled", "true");
-      window.location.reload();
-    }
+  const handleReplayIntro = () => {
+    localStorage.setItem("replayIntro", "true");
+    window.location.reload();
   };
 
-  const buttonColor = active && !blocked ? "red" : "green";
-  const buttonLabel = active && !blocked ? "Turn off" : "Let\u2019s go!";
+  const handlePrimary = () => {
+    if (active && !blocked) {
+      localStorage.removeItem("musicEnabled");
+    } else if (!active) {
+      localStorage.setItem("musicEnabled", "true");
+    }
+    window.location.reload();
+  };
+
   const bodyText = active && !blocked
     ? "Turn off the music?"
     : blocked
       ? "Browser blocked the music — click to enable it now"
       : "The page will start playing music";
 
+  const primaryColor = active && !blocked ? "red" : "green";
+  const primaryLabel = active && !blocked ? "Turn off" : "Let\u2019s go!";
+
   return (
     <ModalWrapper onBack={() => dispatch(closeModal())} maxWidth="380px" fitContent>
       <BalatroPanel title="MUSIC">
         <Content>
           <BalatroText variant="body">{bodyText}</BalatroText>
-          <BalatroButton color={buttonColor} onClick={handleConfirm}>
-            {buttonLabel}
+          <BalatroButton color={primaryColor} onClick={handlePrimary}>
+            {primaryLabel}
+          </BalatroButton>
+          <BalatroButton color="blue" onClick={handleReplayIntro}>
+            Replay intro
           </BalatroButton>
         </Content>
       </BalatroPanel>
