@@ -24,7 +24,8 @@ const useBurnAnimation = (
     const tick = (now: number) => {
       const raw = Math.min((now - start) / durationMs, 1);
       const t = 1 - Math.pow(1 - raw, 2.5);
-      const mainBias = -43 + 48 * t;
+      // -55 guarantees full transparency: A'=50*R+mainBias, max R=1 → 50-55=-5<0, no pixels leak
+      const mainBias = -55 + 60 * t;
       const edgeBias = mainBias - 2;
       const vals = (b: number) =>
         `0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  50 0 0 0 ${b.toFixed(2)}`;
@@ -64,8 +65,10 @@ const useBurnOutAnimation = (
     const tick = (now: number) => {
       const raw = Math.min((now - start) / durationMs, 1);
       const t = 1 - Math.pow(1 - raw, 2.5);
-      // Reversed: starts revealed (mainBias=48 means full reveal) and burns OUT to -43 (hidden)
-      const mainBias = 48 - 91 * t;
+      // Starts just above 0 so burning is visible within the first ~250ms.
+      // mainBias < 0 is when noise pixels start disappearing — previously started at 48 which
+      // meant 3 seconds of invisible "waiting" before any burn appeared.
+      const mainBias = 3 - 46 * t;
       const edgeBias = mainBias + 2;
       const vals = (b: number) =>
         `0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  50 0 0 0 ${b.toFixed(2)}`;
@@ -152,10 +155,10 @@ export const BurnRevealFilter: FC<{ onCardComplete?: () => void; active?: boolea
     >
       <defs>
         <filter id="burn-reveal-title" x="-8%" y="-8%" width="116%" height="116%">
-          {filterPrimitives(titleMainRef, titleEdgeRef, TITLE_SEED, -43)}
+          {filterPrimitives(titleMainRef, titleEdgeRef, TITLE_SEED, -55)}
         </filter>
         <filter id="burn-reveal-card" x="-8%" y="-8%" width="116%" height="116%">
-          {filterPrimitives(cardMainRef, cardEdgeRef, CARD_SEED, -43)}
+          {filterPrimitives(cardMainRef, cardEdgeRef, CARD_SEED, -55)}
         </filter>
       </defs>
     </svg>
@@ -179,7 +182,7 @@ export const BurnOutFilter: FC<{
     >
       <defs>
         <filter id="burn-out-card" x="-8%" y="-8%" width="116%" height="116%">
-          {filterPrimitives(mainRef, edgeRef, CARD_OUT_SEED, 48)}
+          {filterPrimitives(mainRef, edgeRef, CARD_OUT_SEED, 3)}
         </filter>
       </defs>
     </svg>

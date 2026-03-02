@@ -1,10 +1,10 @@
-import { type FC, useState, useEffect, useRef, useCallback } from 'react';
-import { Canvas } from '@react-three/fiber';
-import styled from 'styled-components';
-import { BalatroBackground } from '../../components/three/BalatroBackground';
-import { SwirlCards } from '../../components/three/SwirlCards';
-import { BurnOutFilter } from './BurnReveal';
-import { theme } from '../../styles/theme';
+import { type FC, useState, useEffect, useRef, useCallback } from "react";
+import { Canvas } from "@react-three/fiber";
+import styled from "styled-components";
+import { BalatroBackground } from "../../components/three/BalatroBackground";
+import { SwirlCards } from "../../components/three/SwirlCards";
+import { BurnOutFilter } from "./BurnReveal";
+import { theme } from "../../styles/theme";
 
 interface IntroSequenceProps {
   onRevealStart: () => void;
@@ -12,7 +12,7 @@ interface IntroSequenceProps {
   cardTexture: string;
 }
 
-type Phase = 'card-only' | 'burn-out' | 'white-flash' | 'reveal' | 'done';
+type Phase = "card-only" | "burn-out" | "white-flash" | "reveal" | "done";
 
 const Overlay = styled.div`
   position: fixed;
@@ -38,7 +38,7 @@ const IntroCard = styled.img<{ $burning: boolean }>`
   min-width: 150px;
   max-width: 240px;
   height: auto;
-  filter: ${({ $burning }) => ($burning ? 'url(#burn-out-card)' : 'none')};
+  filter: ${({ $burning }) => ($burning ? "url(#burn-out-card)" : "none")};
   z-index: 2;
   pointer-events: none;
   user-select: none;
@@ -71,10 +71,14 @@ const SkipHint = styled.div`
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
 `;
 
-export const IntroSequence: FC<IntroSequenceProps> = ({ onRevealStart, onComplete, cardTexture }) => {
-  const [phase, setPhase] = useState<Phase>('card-only');
+export const IntroSequence: FC<IntroSequenceProps> = ({
+  onRevealStart,
+  onComplete,
+  cardTexture,
+}) => {
+  const [phase, setPhase] = useState<Phase>("burn-out");
   const [burnProgress, setBurnProgress] = useState(0);
-  const [flashSize, setFlashSize] = useState('0vmax');
+  const [flashProgress, setFlashProgress] = useState(0);
   const [revealOpacity, setRevealOpacity] = useState(1);
   const [skipClicks, setSkipClicks] = useState(0);
 
@@ -83,7 +87,7 @@ export const IntroSequence: FC<IntroSequenceProps> = ({ onRevealStart, onComplet
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
 
-  const phaseRef = useRef<Phase>('card-only');
+  const phaseRef = useRef<Phase>("burn-out");
   phaseRef.current = phase;
 
   const doSkip = useCallback(() => {
@@ -99,15 +103,10 @@ export const IntroSequence: FC<IntroSequenceProps> = ({ onRevealStart, onComplet
     });
   }, [doSkip]);
 
-  // card-only → burn-out after 500ms
-  useEffect(() => {
-    const id = setTimeout(() => setPhase('burn-out'), 500);
-    return () => clearTimeout(id);
-  }, []);
 
   // white-flash → animate clip circle → reveal
   useEffect(() => {
-    if (phase !== 'white-flash') return;
+    if (phase !== "white-flash") return;
     onRevealStartRef.current();
 
     const duration = 800;
@@ -118,11 +117,11 @@ export const IntroSequence: FC<IntroSequenceProps> = ({ onRevealStart, onComplet
       const t = Math.min((now - start) / duration, 1);
       // ease-in to make it feel like a rapid explosion
       const eased = t * t;
-      setFlashSize(`${eased * 200}vmax`);
+      setFlashProgress(eased);
       if (t < 1) {
         rafId = requestAnimationFrame(tick);
       } else {
-        setPhase('reveal');
+        setPhase("reveal");
       }
     };
 
@@ -132,7 +131,7 @@ export const IntroSequence: FC<IntroSequenceProps> = ({ onRevealStart, onComplet
 
   // reveal → fade out → done
   useEffect(() => {
-    if (phase !== 'reveal') return;
+    if (phase !== "reveal") return;
     setRevealOpacity(1);
 
     const id = setTimeout(() => {
@@ -141,7 +140,7 @@ export const IntroSequence: FC<IntroSequenceProps> = ({ onRevealStart, onComplet
 
     const completeId = setTimeout(() => {
       onCompleteRef.current();
-      setPhase('done');
+      setPhase("done");
     }, 700);
 
     return () => {
@@ -150,46 +149,61 @@ export const IntroSequence: FC<IntroSequenceProps> = ({ onRevealStart, onComplet
     };
   }, [phase]);
 
-  if (phase === 'done') return null;
+  if (phase === "done") return null;
 
-  const bgOpacity = burnProgress >= 0.5 ? (burnProgress - 0.5) * 2 : 0;
+  // Canvas fades in at burn-out start, then fades out as the flash expands
+  const bgOpacity =
+    phase === 'burn-out' ? Math.min(burnProgress / 0.08, 1) :
+    phase === 'white-flash' ? Math.max(1 - flashProgress * 2, 0) :
+    0;
   const swirlOpacity = bgOpacity;
 
-  const dotRadius = `${burnProgress * 8}vw`;
-  const dotOpacity = burnProgress * 0.9;
+  const s = burnProgress;
+  // Snap to full brightness almost immediately — looks blinding from the first frames.
+  const bright = Math.min(s / 0.05, 1);
+
+  const makeSunGlow = (size: number, extraBright: number) => {
+    const b = Math.min(bright * extraBright, 1);
+    return [
+      // Very faint warm tinge only at the extreme outer edge — everything else is white
+      `radial-gradient(ellipse 120% 90% at 51% 50%, rgba(255,240,220,${b * 0.12}) 0%, transparent ${size * 30}vw)`,
+      // Large white bloom — pure white haze flooding outward
+      `radial-gradient(circle at 50% 50%, rgba(255,255,255,${b * 0.9}) 0%, rgba(255,255,255,${b * 0.55}) ${size * 8}vw, transparent ${size * 20}vw)`,
+      // Blinding white core
+      `radial-gradient(circle at 50% 50%, rgba(255,255,255,${b}) 0%, rgba(255,255,255,${b}) ${size * 3}vw, rgba(255,255,255,${b * 0.85}) ${size * 6}vw, transparent ${size * 14}vw)`,
+    ].join(", ");
+  };
 
   const whiteDotStyle: React.CSSProperties =
-    phase === 'burn-out'
-      ? {
-          background: `radial-gradient(circle at 50% 50%, rgba(255,255,255,${dotOpacity}) ${dotRadius}, transparent ${dotRadius})`,
-        }
-      : phase === 'white-flash'
-      ? {
-          background: 'white',
-          clipPath: `circle(${flashSize} at 50% 50%)`,
-        }
-      : phase === 'reveal'
-      ? {
-          background: 'white',
-          clipPath: `circle(200vmax at 50% 50%)`,
-          opacity: revealOpacity,
-          transition: 'opacity 0.65s ease-out',
-        }
-      : {};
+    phase === "burn-out"
+      ? { background: makeSunGlow(0.01 + Math.pow(s, 0.2) * 0.89, 1) }
+      : phase === "white-flash"
+        ? {
+            // Expanding sun bloom — same gradient but rapidly growing, no hard disc edge
+            background: makeSunGlow(
+              1 + flashProgress * 12,
+              1 + flashProgress * 4,
+            ),
+          }
+        : phase === "reveal"
+          ? { background: makeSunGlow(13, 5) }
+          : {};
+
+  const overlayOpacity = phase === 'reveal' ? revealOpacity : 1;
 
   return (
-    <Overlay onClick={handleClick}>
+    <Overlay onClick={handleClick} style={{ opacity: overlayOpacity, transition: phase === 'reveal' ? 'opacity 0.65s ease-out' : 'none' }}>
       <BurnOutFilter
-        active={phase === 'burn-out'}
+        active={phase === "burn-out"}
         onProgress={setBurnProgress}
-        onComplete={() => setPhase('white-flash')}
+        onComplete={() => setPhase("white-flash")}
       />
 
       <CanvasWrapper $opacity={bgOpacity}>
         <Canvas
           gl={{ antialias: false }}
           dpr={[1, 2]}
-          style={{ position: 'absolute', inset: 0 }}
+          style={{ position: "absolute", inset: 0 }}
         >
           <BalatroBackground
             color1={[0.1, 0.3, 0.85, 1.0]}
@@ -203,7 +217,7 @@ export const IntroSequence: FC<IntroSequenceProps> = ({ onRevealStart, onComplet
       <IntroCard
         src={`/jokers/${cardTexture}.png`}
         alt="Intro card"
-        $burning={phase === 'burn-out'}
+        $burning={true}
       />
 
       <WhiteDotOverlay style={whiteDotStyle} />
@@ -211,7 +225,7 @@ export const IntroSequence: FC<IntroSequenceProps> = ({ onRevealStart, onComplet
       <SkipHint>
         {skipClicks > 0
           ? `click anywhere × ${3 - skipClicks} to skip`
-          : 'click anywhere × 3 to skip'}
+          : "click anywhere × 3 to skip"}
       </SkipHint>
     </Overlay>
   );

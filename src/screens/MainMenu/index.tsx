@@ -37,7 +37,7 @@ import {
   MusicBubbleBox,
   MusicBubbleDismiss,
 } from "./MainMenuStyles";
-import { DRAG_TAUNTS } from "../../constants";
+import { DRAG_TAUNTS, BURN_IN_AFTER_INTRO_DELAY_MS } from "../../constants";
 import { BalatroButton } from "../../components/ui/BalatroButton";
 import { isMusicEnabled, audioPlayer } from "../../services/audioPlayer";
 import { BurnRevealFilter } from "./BurnReveal";
@@ -168,7 +168,7 @@ export const MainMenu: FC = () => {
       {introActive && (
         <IntroSequence
           cardTexture={cardTexture}
-          onRevealStart={() => setBurnInActive(true)}
+          onRevealStart={() => setTimeout(() => setBurnInActive(true), BURN_IN_AFTER_INTRO_DELAY_MS)}
           onComplete={() => {
             setIntroActive(false);
             localStorage.setItem('introPlayed', 'true');
