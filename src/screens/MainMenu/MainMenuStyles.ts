@@ -51,7 +51,7 @@ export const TitleLogo = styled.img`
   width: 75vw;
   max-width: 1100px;
   height: auto;
-  filter: url(#burn-reveal);
+  filter: url(#burn-reveal-title);
   /* CSS masking applies AFTER filter effects (CSS Masking Level 1 spec),
      so this clips the filter's output (incl. fire glow) to the logo's pixel shape */
   mask-image: url(/title.png);
@@ -69,7 +69,7 @@ export const CardImage = styled.img<{ $src: string }>`
   max-width: 240px;
   height: auto;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
-  filter: url(#burn-reveal);
+  filter: url(#burn-reveal-card);
   mask-image: url(${({ $src }) => $src});
   mask-size: 100% 100%;
   pointer-events: auto;

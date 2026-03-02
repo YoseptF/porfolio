@@ -113,12 +113,15 @@ export const MainMenu: FC = () => {
   const dispatch = useAppDispatch();
   const { cardRef, onPointerDown, onPointerMove, onPointerUp, hasDragged } = useCardDrag();
   const tooltipText = isTouch ? taunt.touch : taunt.mouse;
-  const { completedWords, inProgress } = useTypewriter(tooltipText, true, 0);
 
   const [bubbleDismissed, setBubbleDismissed] = useState(
     () => localStorage.getItem("musicBubbleDismissed") === "true"
   );
   const [showAudioBlockedBubble, setShowAudioBlockedBubble] = useState(false);
+  const [cardBurnDone, setCardBurnDone] = useState(false);
+
+  const { completedWords, inProgress } = useTypewriter(tooltipText, cardBurnDone, 0);
+
 
   // After 1s, if music is enabled but audio hasn't started (browser blocked autoplay),
   // show the "browsers block music" speech bubble.
@@ -151,7 +154,7 @@ export const MainMenu: FC = () => {
 
   return (
     <Wrapper>
-      <BurnRevealFilter />
+      <BurnRevealFilter onCardComplete={() => setCardBurnDone(true)} />
       <Canvas
         gl={{ antialias: false }}
         dpr={[1, 2]}
@@ -179,7 +182,7 @@ export const MainMenu: FC = () => {
             onPointerUp={onPointerUp}
             draggable={false}
           />
-          <JimboTooltipWrapper $visible={!hasDragged}>
+          <JimboTooltipWrapper $visible={cardBurnDone && !hasDragged}>
             <JimboTooltipArrow />
             <JimboTooltipBubble>
               <JimboTooltipText>
