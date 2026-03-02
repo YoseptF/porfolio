@@ -308,7 +308,7 @@ export const SocialsRow = styled.div`
   gap: 8px;
 
   @media (min-width: 601px) {
-    ${SocialIconButton}:last-child {
+    & > ${SocialIconButton}:last-child {
       display: none;
     }
   }
@@ -334,7 +334,7 @@ export const MusicButtonWrapper = styled.div`
   position: relative;
 `;
 
-export const MusicSpeechBubble = styled.div<{ $clickable?: boolean }>`
+export const MusicSpeechBubble = styled.div`
   position: absolute;
   right: calc(100% + 8px);
   top: 50%;
@@ -343,7 +343,7 @@ export const MusicSpeechBubble = styled.div<{ $clickable?: boolean }>`
   flex-direction: row;
   align-items: center;
   z-index: 20;
-  cursor: ${({ $clickable }) => ($clickable ? "pointer" : "default")};
+  pointer-events: none;
 
   @media (max-width: 600px) {
     right: auto;
@@ -401,6 +401,7 @@ export const MusicBubbleDismiss = styled.button`
   background: none;
   border: none;
   cursor: pointer;
+  pointer-events: auto;
   font-family: ${theme.font.family};
   font-size: 1rem;
   color: #2a2520;

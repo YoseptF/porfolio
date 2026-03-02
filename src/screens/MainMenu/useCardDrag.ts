@@ -1,7 +1,9 @@
-import { useRef, useCallback, useEffect } from 'react'
+import { useRef, useCallback, useEffect, useState } from 'react'
 
 export const useCardDrag = () => {
   const cardRef = useRef<HTMLImageElement>(null)
+  const hasDraggedRef = useRef(false)
+  const [hasDragged, setHasDragged] = useState(false)
   const animFrame = useRef(0)
   const startTime = useRef(0)
   const dragState = useRef({
@@ -51,6 +53,11 @@ export const useCardDrag = () => {
   const onPointerMove = useCallback((e: React.PointerEvent<HTMLImageElement>) => {
     if (!dragState.current.dragging || !cardRef.current) return
 
+    if (!hasDraggedRef.current) {
+      hasDraggedRef.current = true
+      setHasDragged(true)
+    }
+
     const rect = cardRef.current.parentElement?.getBoundingClientRect()
     if (!rect) return
 
@@ -65,5 +72,5 @@ export const useCardDrag = () => {
     dragState.current.dragging = false
   }, [])
 
-  return { cardRef, onPointerDown, onPointerMove, onPointerUp }
+  return { cardRef, onPointerDown, onPointerMove, onPointerUp, hasDragged }
 }

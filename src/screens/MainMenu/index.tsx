@@ -111,10 +111,9 @@ const useTypewriter = (text: string, active: boolean, seed: number) => {
 
 export const MainMenu: FC = () => {
   const dispatch = useAppDispatch();
-  const { cardRef, onPointerDown, onPointerMove, onPointerUp } = useCardDrag();
+  const { cardRef, onPointerDown, onPointerMove, onPointerUp, hasDragged } = useCardDrag();
   const tooltipText = isTouch ? taunt.touch : taunt.mouse;
-  const [typewriterSeed, setTypewriterSeed] = useState(0);
-  const { completedWords, inProgress } = useTypewriter(tooltipText, true, typewriterSeed);
+  const { completedWords, inProgress } = useTypewriter(tooltipText, true, 0);
 
   const [bubbleDismissed, setBubbleDismissed] = useState(
     () => localStorage.getItem("musicBubbleDismissed") === "true"
@@ -131,24 +130,10 @@ export const MainMenu: FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // When music is enabled, restart typewriter on first interaction so voices fire
-  // after the browser unblocks audio on that gesture.
-  useEffect(() => {
-    if (!isMusicActive) return;
-    const restart = () => setTypewriterSeed(s => s + 1);
-    document.addEventListener("click", restart, { once: true });
-    document.addEventListener("keydown", restart, { once: true });
-    return () => {
-      document.removeEventListener("click", restart);
-      document.removeEventListener("keydown", restart);
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const prevCharCount = useRef(0);
   useEffect(() => {
     const count = completedWords.reduce((sum, w) => sum + w.length, 0) + inProgress.length;
-    if (isMusicActive && count > prevCharCount.current) {
+    if (isMusicActive && audioPlayer.isPlaying() && count > prevCharCount.current) {
       playVoice();
     }
     prevCharCount.current = count;
@@ -158,12 +143,6 @@ export const MainMenu: FC = () => {
     e.stopPropagation();
     localStorage.setItem("musicBubbleDismissed", "true");
     setBubbleDismissed(true);
-  };
-
-  const handleAudioBlockedClick = () => {
-    audioPlayer.tryPlay();
-    setShowAudioBlockedBubble(false);
-    setTypewriterSeed(s => s + 1);
   };
 
   const showMusicBubble =
@@ -200,7 +179,7 @@ export const MainMenu: FC = () => {
             onPointerUp={onPointerUp}
             draggable={false}
           />
-          <JimboTooltipWrapper $visible={true}>
+          <JimboTooltipWrapper $visible={!hasDragged}>
             <JimboTooltipArrow />
             <JimboTooltipBubble>
               <JimboTooltipText>
@@ -258,9 +237,9 @@ export const MainMenu: FC = () => {
             </SocialIconButton>
             {showMusicBubble && (
               isMusicActive ? (
-                <MusicSpeechBubble $clickable onClick={handleAudioBlockedClick}>
+                <MusicSpeechBubble>
                   <MusicBubbleBox>
-                    browsers block music — click here to enable it
+                    browsers block music — click the button to enable it
                   </MusicBubbleBox>
                   <MusicBubbleArrow />
                 </MusicSpeechBubble>
