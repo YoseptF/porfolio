@@ -7,8 +7,6 @@ import { useCardDrag } from "./useCardDrag";
 import {
   GitHubIcon,
   LinkedInIcon,
-  MusicOffIcon,
-  MusicOnIcon,
   ResumeIcon,
   SocialIconButton,
 } from "./SocialIcons";
@@ -16,8 +14,8 @@ import {
   Wrapper,
   TitleCardArea,
   TitleCardWrapper,
-  TitleLogo,
   CardImage,
+  TitleLogo,
   VersionText,
   BottomArea,
   ProfileContainer,
@@ -26,118 +24,28 @@ import {
   PlayButton,
   MenuButton,
   SocialsRow,
-  JimboTooltipWrapper,
-  JimboTooltipArrow,
-  JimboTooltipBubble,
-  JimboTooltipText,
-  TooltipWord,
-  MusicButtonWrapper,
-  MusicSpeechBubble,
-  MusicBubbleArrow,
-  MusicBubbleBox,
-  MusicBubbleDismiss,
 } from "./MainMenuStyles";
-import { DRAG_TAUNTS, TAUNT_CYCLE_MS } from "../../constants";
 import { BalatroButton } from "../../components/ui/BalatroButton";
 import { isMusicEnabled, audioPlayer } from "../../services/audioPlayer";
 import { BurnRevealFilter } from "./BurnReveal";
 import { IntroSequence } from "./IntroSequence";
 import { DebugSwirl } from "./DebugSwirl";
 import { slowFilters } from "../../utils/browserCaps";
+import { useTypewriter, type TypewriterState } from "./useTypewriter";
+import { useTauntCycle } from "./useTauntCycle";
+import { useMusicBubble } from "./useMusicBubble";
+import { JimboTooltip } from "./JimboTooltip";
+import { MusicButton } from "./MusicButton";
 
-const isTouch = window.matchMedia("(pointer: coarse)").matches;
-const DEFAULT_TAUNT = {
-  touch: "Hold and drag the card",
-  mouse: "Click and drag the card",
-};
-
-const personalCards = [
-  "1",
-  "2",
-  "3",
-  "4",
-  "5",
-  "6",
-  "7",
-  "8",
-  "9",
-  "10",
-  "11",
-  "12",
-];
+const personalCards = ["1","2","3","4","5","6","7","8","9","10","11","12"];
 const cardTexture =
   personalCards[Math.floor(Math.random() * personalCards.length)] ?? "1";
 
 const VOICE_COUNT = 11;
-// isMusicActive lives in component state so it reacts when music is enabled without a page reload
 
 const playVoice = () => {
   const n = Math.floor(Math.random() * VOICE_COUNT) + 1;
   new Audio(`/voice/voice${n}.mp3`).play().catch(() => {});
-};
-
-type TypewriterState = { completedWords: string[]; inProgress: string };
-
-const buildTypewriterFrames = (text: string) => {
-  const frames: { state: TypewriterState; delay: number }[] = [];
-  const done: string[] = [];
-  let word = "";
-  let elapsed = 0;
-
-  for (let i = 0; i < text.length; i++) {
-    const char = text[i] ?? "";
-    const isSpace = char === " ";
-    const isLast = i === text.length - 1;
-
-    elapsed += 65;
-
-    if (isSpace) {
-      done.push(word);
-      word = "";
-      frames.push({
-        state: { completedWords: [...done], inProgress: "" },
-        delay: elapsed,
-      });
-    } else {
-      word += char;
-      if (isLast) {
-        done.push(word);
-        frames.push({
-          state: { completedWords: [...done], inProgress: "" },
-          delay: elapsed,
-        });
-      } else {
-        frames.push({
-          state: { completedWords: [...done], inProgress: word },
-          delay: elapsed,
-        });
-      }
-    }
-  }
-
-  return frames;
-};
-
-const useTypewriter = (text: string, active: boolean, seed: number) => {
-  const [state, setState] = useState<TypewriterState>({
-    completedWords: [],
-    inProgress: "",
-  });
-
-  useEffect(() => {
-    if (!active) {
-      setState({ completedWords: [], inProgress: "" });
-      return;
-    }
-    setState({ completedWords: [], inProgress: "" });
-    const frames = buildTypewriterFrames(text);
-    const ids = frames.map(({ state: s, delay }) =>
-      setTimeout(() => setState(s), delay),
-    );
-    return () => ids.forEach(clearTimeout);
-  }, [active, text, seed]);
-
-  return state;
 };
 
 const MAX_DPR = slowFilters ? 1.5 : 2;
@@ -154,22 +62,39 @@ export const MainMenu: FC = () => {
   const dispatch = useAppDispatch();
   const { cardRef, onPointerDown, onPointerMove, onPointerUp, hasDragged } =
     useCardDrag();
-  const [tauntIndex, setTauntIndex] = useState(
-    () => Math.floor(Math.random() * DRAG_TAUNTS.length),
-  );
-  const [tauntSeed, setTauntSeed] = useState(0);
-  const taunt = DRAG_TAUNTS[tauntIndex] ?? DEFAULT_TAUNT;
-  const tooltipText = isTouch ? taunt.touch : taunt.mouse;
 
-  const [isMusicActive, setIsMusicActive] = useState(() => isMusicEnabled());
   const [introActive, setIntroActive] = useState(() => shouldPlayIntro());
   const [burnInActive, setBurnInActive] = useState(() => !shouldPlayIntro());
-
-  const [bubbleDismissed, setBubbleDismissed] = useState(
-    () => localStorage.getItem("musicBubbleDismissed") === "true",
-  );
-  const [showAudioBlockedBubble, setShowAudioBlockedBubble] = useState(false);
   const [cardBurnDone, setCardBurnDone] = useState(false);
+
+  const {
+    isMusicActive,
+    setIsMusicActive,
+    setShowAudioBlockedBubble,
+    showMusicBubble,
+    handleDismissBubble,
+  } = useMusicBubble(introActive);
+
+  // typewriterRef breaks the circular dep: useTauntCycle needs typewriter
+  // output to know when typing is done, but useTypewriter needs tooltipText
+  // from useTauntCycle. We pass the previous render's typewriter state.
+  const typewriterRef = useRef<TypewriterState>({ completedWords: [], inProgress: "" });
+
+  const { tauntSeed, tooltipText } = useTauntCycle({
+    completedWords: typewriterRef.current.completedWords,
+    inProgress: typewriterRef.current.inProgress,
+    cardBurnDone,
+    hasDragged,
+  });
+
+  const { completedWords, inProgress } = useTypewriter(
+    tooltipText,
+    cardBurnDone,
+    tauntSeed,
+  );
+
+  // Sync current render's typewriter state into the ref for the next render
+  typewriterRef.current = { completedWords, inProgress };
 
   useEffect(() => {
     const handler = () => {
@@ -181,7 +106,7 @@ export const MainMenu: FC = () => {
     };
     window.addEventListener("portfolio:restart-intro", handler);
     return () => window.removeEventListener("portfolio:restart-intro", handler);
-  }, []);
+  }, [setIsMusicActive, setShowAudioBlockedBubble]);
 
   useEffect(() => {
     const handler = () => {
@@ -192,28 +117,7 @@ export const MainMenu: FC = () => {
     };
     window.addEventListener("portfolio:restart-main-menu", handler);
     return () => window.removeEventListener("portfolio:restart-main-menu", handler);
-  }, []);
-
-  const { completedWords, inProgress } = useTypewriter(
-    tooltipText,
-    cardBurnDone,
-    tauntSeed,
-  );
-  const isTypingDone =
-    completedWords.length > 0 &&
-    inProgress === "" &&
-    completedWords.join(" ") === tooltipText;
-
-  // After 1s post-intro, if music is enabled but audio hasn't started (browser blocked autoplay),
-  // show the "browsers block music" speech bubble.
-  useEffect(() => {
-    if (!isMusicActive) return;
-    if (introActive) return;
-    const timer = setTimeout(() => {
-      if (!audioPlayer.isPlaying()) setShowAudioBlockedBubble(true);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [introActive, isMusicActive]);
+  }, [setShowAudioBlockedBubble]);
 
   const prevCharCount = useRef(0);
   useEffect(() => {
@@ -228,30 +132,6 @@ export const MainMenu: FC = () => {
     }
     prevCharCount.current = count;
   }, [completedWords, inProgress, isMusicActive]);
-
-  // After 9s of inactivity (taunt fully typed, no drag), cycle to a new taunt
-  useEffect(() => {
-    if (!isTypingDone || hasDragged || !cardBurnDone) return;
-    const id = setTimeout(() => {
-      setTauntIndex((prev) => {
-        let next = prev;
-        while (next === prev) next = Math.floor(Math.random() * DRAG_TAUNTS.length);
-        return next;
-      });
-      setTauntSeed((s) => s + 1);
-    }, TAUNT_CYCLE_MS);
-    return () => clearTimeout(id);
-  }, [isTypingDone, hasDragged, cardBurnDone]);
-
-  const handleDismissBubble = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    localStorage.setItem("musicBubbleDismissed", "true");
-    setBubbleDismissed(true);
-  };
-
-  const showMusicBubble =
-    (isMusicActive && showAudioBlockedBubble) ||
-    (!isMusicActive && !bubbleDismissed);
 
   if (isDebugSwirl) return <DebugSwirl />;
 
@@ -302,19 +182,11 @@ export const MainMenu: FC = () => {
             onPointerUp={onPointerUp}
             draggable={false}
           />
-          <JimboTooltipWrapper $visible={cardBurnDone && !hasDragged}>
-            <JimboTooltipArrow />
-            <JimboTooltipBubble>
-              <JimboTooltipText>
-                {completedWords.map((word, i) => (
-                  <span key={i}>
-                    <TooltipWord>{word}</TooltipWord>{" "}
-                  </span>
-                ))}
-                {inProgress}
-              </JimboTooltipText>
-            </JimboTooltipBubble>
-          </JimboTooltipWrapper>
+          <JimboTooltip
+            completedWords={completedWords}
+            inProgress={inProgress}
+            visible={cardBurnDone && !hasDragged}
+          />
         </TitleCardWrapper>
       </TitleCardArea>
 
@@ -356,44 +228,12 @@ export const MainMenu: FC = () => {
         </ButtonsContainer>
 
         <SocialsRow>
-          <MusicButtonWrapper>
-            <SocialIconButton
-              as="button"
-              $bgColor={isMusicActive ? "#27ae60" : "#c0392b"}
-              onClick={() => dispatch(openModal("music"))}
-            >
-              {isMusicActive ? <MusicOnIcon /> : <MusicOffIcon />}
-            </SocialIconButton>
-            {showMusicBubble &&
-              (isMusicActive ? (
-                <MusicSpeechBubble>
-                  <MusicBubbleBox>
-                    Browsers block music — click the button to enable it
-                  </MusicBubbleBox>
-                  <MusicBubbleArrow />
-                </MusicSpeechBubble>
-              ) : (
-                <MusicSpeechBubble>
-                  <MusicBubbleBox>
-                    this site is{" "}
-                    <strong
-                      style={{
-                        color: "red",
-                        fontWeight: 500,
-                        fontSize: "1.8rem",
-                      }}
-                    >
-                      way
-                    </strong>{" "}
-                    better with music I promise
-                    <MusicBubbleDismiss onClick={handleDismissBubble}>
-                      ×
-                    </MusicBubbleDismiss>
-                  </MusicBubbleBox>
-                  <MusicBubbleArrow />
-                </MusicSpeechBubble>
-              ))}
-          </MusicButtonWrapper>
+          <MusicButton
+            isMusicActive={isMusicActive}
+            showMusicBubble={showMusicBubble}
+            handleDismissBubble={handleDismissBubble}
+            onOpen={() => dispatch(openModal("music"))}
+          />
           <SocialIconButton
             $bgColor="#1a1a1a"
             href="https://github.com/YoseptF"
