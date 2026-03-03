@@ -37,7 +37,7 @@ import {
   MusicBubbleBox,
   MusicBubbleDismiss,
 } from "./MainMenuStyles";
-import { DRAG_TAUNTS, BURN_IN_AFTER_INTRO_DELAY_MS } from "../../constants";
+import { DRAG_TAUNTS } from "../../constants";
 import { BalatroButton } from "../../components/ui/BalatroButton";
 import { isMusicEnabled, audioPlayer } from "../../services/audioPlayer";
 import { BurnRevealFilter } from "./BurnReveal";
@@ -228,17 +228,13 @@ export const MainMenu: FC = () => {
       {introActive && (
         <IntroSequence
           cardTexture={cardTexture}
-          onRevealStart={() =>
-            setTimeout(
-              () => setBurnInActive(true),
-              BURN_IN_AFTER_INTRO_DELAY_MS,
-            )
-          }
+          onRevealStart={() => {}}
           onComplete={() => {
             setIntroActive(false);
             localStorage.setItem("introPlayed", "true");
             localStorage.removeItem("replayIntro");
             if (isMusicEnabled()) audioPlayer.start();
+            setTimeout(() => setBurnInActive(true), 1500);
           }}
         />
       )}
@@ -262,7 +258,7 @@ export const MainMenu: FC = () => {
       </VersionText>
 
       <TitleCardArea>
-        <TitleCardWrapper>
+        <TitleCardWrapper style={{ opacity: burnInActive ? 1 : 0 }}>
           <TitleLogo src="/title.png" alt="JOSEPH" />
           <CardImage
             ref={cardRef}

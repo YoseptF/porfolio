@@ -2,7 +2,6 @@ export const EXPERIENCE = new Date().getFullYear() - 2019 + "+";
 export const PROJECTS_URL = "/projects/index.json";
 
 export const BURN_TITLE_DURATION_MS = 2200;
-export const BURN_IN_AFTER_INTRO_DELAY_MS = 2000;
 export const BURN_CARD_DURATION_MS = 4800;
 export const BURN_CARD_OUT_DURATION_MS = 9600;
 

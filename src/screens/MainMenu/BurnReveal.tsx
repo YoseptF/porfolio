@@ -114,14 +114,21 @@ export const BurnRevealFilter: FC<{ onCardComplete?: () => void; active?: boolea
   onCardCompleteRef.current = onCardComplete;
 
   useEffect(() => {
-    if (!active) return;
-    const start = performance.now();
-    let rafId: number;
-    let cardFired = false;
-
     const setVals = (ref: RefObject<SVGFEColorMatrixElement | null>, bias: number) =>
       ref.current?.setAttribute('values',
         `0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  50 0 0 0 ${bias.toFixed(2)}`);
+
+    if (!active) {
+      setVals(titleMainRef, -55);
+      setVals(titleEdgeRef, -57);
+      setVals(cardMainRef, -55);
+      setVals(cardEdgeRef, -57);
+      return;
+    }
+
+    const start = performance.now();
+    let rafId: number;
+    let cardFired = false;
 
     const tick = (now: number) => {
       const rawTitle = Math.min((now - start) / BURN_TITLE_DURATION_MS, 1);
