@@ -1,6 +1,7 @@
 import { type FC, useRef, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { slowFilters } from '../../utils/browserCaps';
 import {
   SWIRL_CARD_COUNT,
   SWIRL_CARD_COUNT_INITIAL,
@@ -16,6 +17,8 @@ import {
   SWIRL_CARD_WIDTH,
   SWIRL_CARD_HEIGHT,
 } from '../../constants';
+
+const CARD_COUNT = slowFilters ? 60 : SWIRL_CARD_COUNT;
 
 interface SwirlCardsProps {
   opacity: number;
@@ -42,7 +45,7 @@ export const SwirlCards: FC<SwirlCardsProps> = ({ opacity }) => {
   }, []);
 
   const materials = useMemo(() =>
-    Array.from({ length: SWIRL_CARD_COUNT }, (_, i) => {
+    Array.from({ length: CARD_COUNT }, (_, i) => {
       const useBack = i % 4 === 0;
       const tex = useBack
         ? textures.back
@@ -60,7 +63,7 @@ export const SwirlCards: FC<SwirlCardsProps> = ({ opacity }) => {
   const cardStates = useRef<CardState[]>([]);
 
   useEffect(() => {
-    cardStates.current = Array.from({ length: SWIRL_CARD_COUNT }, (_, i) => {
+    cardStates.current = Array.from({ length: CARD_COUNT }, (_, i) => {
       const speed = SWIRL_SPEED_BASE + Math.random() * SWIRL_SPEED_VARIANCE;
 
       // First batch enters within the initial window; later cards trickle in evenly across the full intro
@@ -129,7 +132,7 @@ export const SwirlCards: FC<SwirlCardsProps> = ({ opacity }) => {
 
   return (
     <group>
-      {Array.from({ length: SWIRL_CARD_COUNT }, (_, i) => (
+      {Array.from({ length: CARD_COUNT }, (_, i) => (
         <mesh
           key={i}
           ref={(el) => { if (el) meshRefs.current[i] = el; }}

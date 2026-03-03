@@ -7,6 +7,7 @@ import { BurnOutFilter } from "./BurnReveal";
 import { theme } from "../../styles/theme";
 import { BURN_CARD_OUT_DURATION_MS } from "../../constants";
 import { isMusicEnabled } from "../../services/audioPlayer";
+import { slowFilters } from "../../utils/browserCaps";
 
 interface IntroSequenceProps {
   onRevealStart: () => void;
@@ -15,6 +16,8 @@ interface IntroSequenceProps {
 }
 
 type Phase = "card-only" | "burn-out" | "white-flash" | "reveal" | "done";
+
+const MAX_DPR = slowFilters ? 1.5 : 2;
 
 const Overlay = styled.div`
   position: fixed;
@@ -239,7 +242,7 @@ export const IntroSequence: FC<IntroSequenceProps> = ({
       <CanvasWrapper $opacity={bgOpacity}>
         <Canvas
           gl={{ antialias: false }}
-          dpr={[1, 2]}
+          dpr={[1, MAX_DPR]}
           style={{ position: "absolute", inset: 0 }}
         >
           <BalatroBackground

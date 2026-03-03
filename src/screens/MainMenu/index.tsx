@@ -43,6 +43,7 @@ import { isMusicEnabled, audioPlayer } from "../../services/audioPlayer";
 import { BurnRevealFilter } from "./BurnReveal";
 import { IntroSequence } from "./IntroSequence";
 import { DebugSwirl } from "./DebugSwirl";
+import { slowFilters } from "../../utils/browserCaps";
 
 const isTouch = window.matchMedia("(pointer: coarse)").matches;
 const DEFAULT_TAUNT = {
@@ -140,6 +141,8 @@ const useTypewriter = (text: string, active: boolean, seed: number) => {
 
   return state;
 };
+
+const MAX_DPR = slowFilters ? 1.5 : 2;
 
 const isDebugSwirl = new URLSearchParams(window.location.search).has(
   "debugSwirl",
@@ -246,7 +249,7 @@ export const MainMenu: FC = () => {
       />
       <Canvas
         gl={{ antialias: false }}
-        dpr={[1, 2]}
+        dpr={[1, MAX_DPR]}
         style={{ position: "absolute", inset: 0 }}
       >
         <BalatroBackground />

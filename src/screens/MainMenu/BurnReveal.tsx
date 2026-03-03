@@ -1,47 +1,13 @@
 import { useEffect, useRef, type FC, type RefObject } from 'react';
 import { BURN_TITLE_DURATION_MS, BURN_CARD_DURATION_MS, BURN_CARD_OUT_DURATION_MS } from '../../constants';
+import { slowFilters } from '../../utils/browserCaps';
 
 const TITLE_SEED = Math.floor(Math.random() * 10000);
 const CARD_SEED = Math.floor(Math.random() * 10000);
 const CARD_OUT_SEED = Math.floor(Math.random() * 10000);
 
-const useBurnAnimation = (
-  mainRef: RefObject<SVGFEColorMatrixElement | null>,
-  edgeRef: RefObject<SVGFEColorMatrixElement | null>,
-  durationMs: number,
-  active: boolean,
-  onComplete?: () => void,
-) => {
-  const onCompleteRef = useRef(onComplete);
-  onCompleteRef.current = onComplete;
-
-  useEffect(() => {
-    if (!active) return;
-    const start = performance.now();
-    let rafId: number;
-    let fired = false;
-
-    const tick = (now: number) => {
-      const raw = Math.min((now - start) / durationMs, 1);
-      const t = 1 - Math.pow(1 - raw, 2.5);
-      // -55 guarantees full transparency: A'=50*R+mainBias, max R=1 → 50-55=-5<0, no pixels leak
-      const mainBias = -55 + 60 * t;
-      const edgeBias = mainBias - 2;
-      const vals = (b: number) =>
-        `0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  50 0 0 0 ${b.toFixed(2)}`;
-      mainRef.current?.setAttribute('values', vals(mainBias));
-      edgeRef.current?.setAttribute('values', vals(edgeBias));
-      if (!fired && mainBias >= 0) {
-        fired = true;
-        onCompleteRef.current?.();
-      }
-      if (raw < 1) rafId = requestAnimationFrame(tick);
-    };
-
-    rafId = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafId);
-  }, [durationMs, mainRef, edgeRef, active]);
-};
+const OCTAVES = slowFilters ? 3 : 5;
+const BLUR_SD = slowFilters ? 3 : 5;
 
 const useBurnOutAnimation = (
   mainRef: RefObject<SVGFEColorMatrixElement | null>,
@@ -97,7 +63,7 @@ const filterPrimitives = (
     <feTurbulence
       type="fractalNoise"
       baseFrequency="0.025 0.028"
-      numOctaves="5"
+      numOctaves={OCTAVES}
       seed={seed}
       result="noise"
     />
@@ -128,7 +94,7 @@ const filterPrimitives = (
     />
     <feFlood floodColor="#ff5500" floodOpacity="1" result="fireColor" />
     <feComposite in="fireColor" in2="frontier" operator="in" result="glowEdge" />
-    <feGaussianBlur in="glowEdge" stdDeviation="5" result="glow" />
+    <feGaussianBlur in="glowEdge" stdDeviation={BLUR_SD} result="glow" />
     <feMerge>
       <feMergeNode in="glow" />
       <feMergeNode in="clipped" />
@@ -144,9 +110,41 @@ export const BurnRevealFilter: FC<{ onCardComplete?: () => void; active?: boolea
   const titleEdgeRef = useRef<SVGFEColorMatrixElement>(null);
   const cardMainRef = useRef<SVGFEColorMatrixElement>(null);
   const cardEdgeRef = useRef<SVGFEColorMatrixElement>(null);
+  const onCardCompleteRef = useRef(onCardComplete);
+  onCardCompleteRef.current = onCardComplete;
 
-  useBurnAnimation(titleMainRef, titleEdgeRef, BURN_TITLE_DURATION_MS, active);
-  useBurnAnimation(cardMainRef, cardEdgeRef, BURN_CARD_DURATION_MS, active, onCardComplete);
+  useEffect(() => {
+    if (!active) return;
+    const start = performance.now();
+    let rafId: number;
+    let cardFired = false;
+
+    const setVals = (ref: RefObject<SVGFEColorMatrixElement | null>, bias: number) =>
+      ref.current?.setAttribute('values',
+        `0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  50 0 0 0 ${bias.toFixed(2)}`);
+
+    const tick = (now: number) => {
+      const rawTitle = Math.min((now - start) / BURN_TITLE_DURATION_MS, 1);
+      const rawCard  = Math.min((now - start) / BURN_CARD_DURATION_MS, 1);
+      const tTitle = 1 - Math.pow(1 - rawTitle, 2.5);
+      const tCard  = 1 - Math.pow(1 - rawCard, 2.5);
+      // -55 guarantees full transparency: A'=50*R+mainBias, max R=1 → 50-55=-5<0, no pixels leak
+      const titleBias = -55 + 60 * tTitle;
+      const cardBias  = -55 + 60 * tCard;
+      setVals(titleMainRef, titleBias);
+      setVals(titleEdgeRef, titleBias - 2);
+      setVals(cardMainRef, cardBias);
+      setVals(cardEdgeRef, cardBias - 2);
+      if (!cardFired && cardBias >= 0) {
+        cardFired = true;
+        onCardCompleteRef.current?.();
+      }
+      if (rawTitle < 1 || rawCard < 1) rafId = requestAnimationFrame(tick);
+    };
+
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
+  }, [active]);
 
   return (
     <svg
