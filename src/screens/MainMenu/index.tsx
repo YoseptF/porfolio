@@ -180,6 +180,17 @@ export const MainMenu: FC = () => {
     return () => window.removeEventListener("portfolio:restart-intro", handler);
   }, []);
 
+  useEffect(() => {
+    const handler = () => {
+      setCardBurnDone(false);
+      setShowAudioBlockedBubble(false);
+      setBurnInActive(false);
+      setTimeout(() => setBurnInActive(true), 50);
+    };
+    window.addEventListener("portfolio:restart-main-menu", handler);
+    return () => window.removeEventListener("portfolio:restart-main-menu", handler);
+  }, []);
+
   const { completedWords, inProgress } = useTypewriter(
     tooltipText,
     cardBurnDone,
@@ -336,7 +347,7 @@ export const MainMenu: FC = () => {
               (isMusicActive ? (
                 <MusicSpeechBubble>
                   <MusicBubbleBox>
-                    browsers block music — click the button to enable it
+                    Browsers block music — click the button to enable it
                   </MusicBubbleBox>
                   <MusicBubbleArrow />
                 </MusicSpeechBubble>

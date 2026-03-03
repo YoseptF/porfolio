@@ -12,7 +12,8 @@ import {
   SWIRL_Z_END,
   SWIRL_XY_RADIUS,
   SWIRL_TURNS,
-  SWIRL_SPEED_BASE,
+  SWIRL_SPEED_INITIAL,
+  SWIRL_SPEED_FINAL,
   SWIRL_SPEED_VARIANCE,
   SWIRL_CARD_WIDTH,
   SWIRL_CARD_HEIGHT,
@@ -64,7 +65,7 @@ export const SwirlCards: FC<SwirlCardsProps> = ({ opacity }) => {
 
   useEffect(() => {
     cardStates.current = Array.from({ length: CARD_COUNT }, (_, i) => {
-      const speed = SWIRL_SPEED_BASE + Math.random() * SWIRL_SPEED_VARIANCE;
+      const speedVariance = Math.random() * SWIRL_SPEED_VARIANCE;
 
       // First batch enters within the initial window; later cards trickle in evenly across the full intro
       const delaySecs = i < SWIRL_CARD_COUNT_INITIAL
@@ -72,9 +73,9 @@ export const SwirlCards: FC<SwirlCardsProps> = ({ opacity }) => {
         : SWIRL_INITIAL_WINDOW_SECONDS + ((i - SWIRL_CARD_COUNT_INITIAL) / (SWIRL_CARD_COUNT - SWIRL_CARD_COUNT_INITIAL)) * (SWIRL_SPREAD_SECONDS - SWIRL_INITIAL_WINDOW_SECONDS) + Math.random() * 0.5;
 
       return {
-        t: -delaySecs * speed,
+        t: -delaySecs * (SWIRL_SPEED_INITIAL + speedVariance),
         angle: Math.random() * Math.PI * 2,
-        speed,
+        speed: speedVariance,
         tumbleAngle: Math.random() * Math.PI * 2,
         tumbleSpeed: (Math.random() < 0.5 ? 1 : -1) * (1.2 + Math.random() * 2.5),
       };
@@ -83,7 +84,9 @@ export const SwirlCards: FC<SwirlCardsProps> = ({ opacity }) => {
 
   useFrame((_state, delta) => {
     cardStates.current.forEach((s, i) => {
-      s.t += s.speed * delta;
+      const t01 = Math.max(s.t, 0);
+      const speed = SWIRL_SPEED_INITIAL + (SWIRL_SPEED_FINAL - SWIRL_SPEED_INITIAL) * t01 + s.speed;
+      s.t += speed * delta;
 
       const mat = materials[i];
       const mesh = meshRefs.current[i];

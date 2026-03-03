@@ -6,7 +6,7 @@ export const BURN_CARD_DURATION_MS = 4800;
 export const BURN_CARD_OUT_DURATION_MS = 9600;
 
 export const SWIRL_CARD_COUNT_INITIAL = 12;
-export const SWIRL_CARD_COUNT = 150;
+export const SWIRL_CARD_COUNT = 120;
 export const SWIRL_INITIAL_WINDOW_SECONDS = 2;
 export const SWIRL_SPREAD_SECONDS = 9.6;
 export const SWIRL_JOKER_COUNT = 12;
@@ -14,8 +14,9 @@ export const SWIRL_Z_START = 4.2;
 export const SWIRL_Z_END = -15.0;
 export const SWIRL_XY_RADIUS = 9.0;
 export const SWIRL_TURNS = 1.8;
-export const SWIRL_SPEED_BASE = 0.12;
-export const SWIRL_SPEED_VARIANCE = 0.11;
+export const SWIRL_SPEED_INITIAL = 0.02;
+export const SWIRL_SPEED_FINAL = 0.45;
+export const SWIRL_SPEED_VARIANCE = 0.08;
 export const SWIRL_CARD_WIDTH = 1.2;
 export const SWIRL_CARD_HEIGHT = 1.68;
 
