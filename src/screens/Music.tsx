@@ -83,9 +83,6 @@ export const Music: FC = () => {
             <BalatroButton color="blue" onClick={handleReplayIntro}>
               Replay intro
             </BalatroButton>
-            <BalatroButton color="red" onClick={handleDisable}>
-              Turn off
-            </BalatroButton>
           </Content>
         </BalatroPanel>
       </ModalWrapper>

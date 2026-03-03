@@ -72,8 +72,8 @@ export const DRAG_TAUNTS: { touch: string; mouse: string }[] = [
     mouse: "You CAN drag me. I checked. Do it already.",
   },
   {
-    touch: "Found the portfolio. Now try finding the drag.",
-    mouse: "Found the portfolio. Now try finding the drag.",
+    touch: "Found the portfolio. Now try dragging me.",
+    mouse: "Found the portfolio. Now try dragging me.",
   },
   {
     touch: "Waiting for a sign? This is the sign. Drag me.",
