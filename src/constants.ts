@@ -20,6 +20,8 @@ export const SWIRL_SPEED_VARIANCE = 0.08;
 export const SWIRL_CARD_WIDTH = 1.2;
 export const SWIRL_CARD_HEIGHT = 1.68;
 
+export const TAUNT_CYCLE_MS = 12000;
+
 export const DRAG_TAUNTS: { touch: string; mouse: string }[] = [
   {
     touch: "Try dragging me around! I dare ya.",
@@ -46,7 +48,35 @@ export const DRAG_TAUNTS: { touch: string; mouse: string }[] = [
     mouse: "I'm completely draggable! Go ahead, click and drag me.",
   },
   {
-    touch: "Don't just stare—swipe to drag me anywhere!",
-    mouse: "Don't just stare—click and drag me anywhere!",
+    touch: "Don't just stare. Swipe and drag me anywhere!",
+    mouse: "Don't just stare. Click and drag me anywhere!",
+  },
+  {
+    touch: "Still just staring? Grab and drag me, pal.",
+    mouse: "Still just staring? Click and drag me, pal.",
+  },
+  {
+    touch: "I've been here a while. At least give me a spin.",
+    mouse: "I've been here a while. At least give me a spin.",
+  },
+  {
+    touch: "The longer you wait, the snarkier I get. Drag me.",
+    mouse: "The longer you wait, the snarkier I get. Drag me.",
+  },
+  {
+    touch: "Move me already. I'm bored just sitting here.",
+    mouse: "Move me already. I'm bored just sitting here.",
+  },
+  {
+    touch: "You CAN drag me. I checked. Do it already.",
+    mouse: "You CAN drag me. I checked. Do it already.",
+  },
+  {
+    touch: "Found the portfolio. Now try finding the drag.",
+    mouse: "Found the portfolio. Now try finding the drag.",
+  },
+  {
+    touch: "Waiting for a sign? This is the sign. Drag me.",
+    mouse: "Waiting for a sign? This is the sign. Drag me.",
   },
 ];

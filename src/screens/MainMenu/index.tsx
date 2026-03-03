@@ -37,7 +37,7 @@ import {
   MusicBubbleBox,
   MusicBubbleDismiss,
 } from "./MainMenuStyles";
-import { DRAG_TAUNTS } from "../../constants";
+import { DRAG_TAUNTS, TAUNT_CYCLE_MS } from "../../constants";
 import { BalatroButton } from "../../components/ui/BalatroButton";
 import { isMusicEnabled, audioPlayer } from "../../services/audioPlayer";
 import { BurnRevealFilter } from "./BurnReveal";
@@ -50,8 +50,6 @@ const DEFAULT_TAUNT = {
   touch: "Hold and drag the card",
   mouse: "Click and drag the card",
 };
-const taunt =
-  DRAG_TAUNTS[Math.floor(Math.random() * DRAG_TAUNTS.length)] ?? DEFAULT_TAUNT;
 
 const personalCards = [
   "1",
@@ -156,6 +154,11 @@ export const MainMenu: FC = () => {
   const dispatch = useAppDispatch();
   const { cardRef, onPointerDown, onPointerMove, onPointerUp, hasDragged } =
     useCardDrag();
+  const [tauntIndex, setTauntIndex] = useState(
+    () => Math.floor(Math.random() * DRAG_TAUNTS.length),
+  );
+  const [tauntSeed, setTauntSeed] = useState(0);
+  const taunt = DRAG_TAUNTS[tauntIndex] ?? DEFAULT_TAUNT;
   const tooltipText = isTouch ? taunt.touch : taunt.mouse;
 
   const [isMusicActive, setIsMusicActive] = useState(() => isMusicEnabled());
@@ -194,8 +197,12 @@ export const MainMenu: FC = () => {
   const { completedWords, inProgress } = useTypewriter(
     tooltipText,
     cardBurnDone,
-    0,
+    tauntSeed,
   );
+  const isTypingDone =
+    completedWords.length > 0 &&
+    inProgress === "" &&
+    completedWords.join(" ") === tooltipText;
 
   // After 1s post-intro, if music is enabled but audio hasn't started (browser blocked autoplay),
   // show the "browsers block music" speech bubble.
@@ -221,6 +228,20 @@ export const MainMenu: FC = () => {
     }
     prevCharCount.current = count;
   }, [completedWords, inProgress, isMusicActive]);
+
+  // After 9s of inactivity (taunt fully typed, no drag), cycle to a new taunt
+  useEffect(() => {
+    if (!isTypingDone || hasDragged || !cardBurnDone) return;
+    const id = setTimeout(() => {
+      setTauntIndex((prev) => {
+        let next = prev;
+        while (next === prev) next = Math.floor(Math.random() * DRAG_TAUNTS.length);
+        return next;
+      });
+      setTauntSeed((s) => s + 1);
+    }, TAUNT_CYCLE_MS);
+    return () => clearTimeout(id);
+  }, [isTypingDone, hasDragged, cardBurnDone]);
 
   const handleDismissBubble = (e: React.MouseEvent) => {
     e.stopPropagation();
