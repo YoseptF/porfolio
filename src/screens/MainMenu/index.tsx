@@ -70,7 +70,7 @@ const cardTexture =
   personalCards[Math.floor(Math.random() * personalCards.length)] ?? "1";
 
 const VOICE_COUNT = 11;
-const isMusicActive = isMusicEnabled();
+// isMusicActive lives in component state so it reacts when music is enabled without a page reload
 
 const playVoice = () => {
   const n = Math.floor(Math.random() * VOICE_COUNT) + 1;
@@ -155,6 +155,7 @@ export const MainMenu: FC = () => {
     useCardDrag();
   const tooltipText = isTouch ? taunt.touch : taunt.mouse;
 
+  const [isMusicActive, setIsMusicActive] = useState(() => isMusicEnabled());
   const [introActive, setIntroActive] = useState(() => shouldPlayIntro());
   const [burnInActive, setBurnInActive] = useState(() => !shouldPlayIntro());
 
@@ -163,6 +164,18 @@ export const MainMenu: FC = () => {
   );
   const [showAudioBlockedBubble, setShowAudioBlockedBubble] = useState(false);
   const [cardBurnDone, setCardBurnDone] = useState(false);
+
+  useEffect(() => {
+    const handler = () => {
+      setIsMusicActive(isMusicEnabled());
+      setIntroActive(true);
+      setBurnInActive(false);
+      setShowAudioBlockedBubble(false);
+      setCardBurnDone(false);
+    };
+    window.addEventListener("portfolio:restart-intro", handler);
+    return () => window.removeEventListener("portfolio:restart-intro", handler);
+  }, []);
 
   const { completedWords, inProgress } = useTypewriter(
     tooltipText,
@@ -179,7 +192,7 @@ export const MainMenu: FC = () => {
       if (!audioPlayer.isPlaying()) setShowAudioBlockedBubble(true);
     }, 1000);
     return () => clearTimeout(timer);
-  }, [introActive]);
+  }, [introActive, isMusicActive]);
 
   const prevCharCount = useRef(0);
   useEffect(() => {
@@ -193,7 +206,7 @@ export const MainMenu: FC = () => {
       playVoice();
     }
     prevCharCount.current = count;
-  }, [completedWords, inProgress]);
+  }, [completedWords, inProgress, isMusicActive]);
 
   const handleDismissBubble = (e: React.MouseEvent) => {
     e.stopPropagation();

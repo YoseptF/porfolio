@@ -17,6 +17,10 @@ const Content = styled.div`
   text-align: center;
 `;
 
+const restartIntro = () => {
+  window.dispatchEvent(new CustomEvent("portfolio:restart-intro"));
+};
+
 export const Music: FC = () => {
   const dispatch = useAppDispatch();
   const active = isMusicEnabled();
@@ -25,7 +29,9 @@ export const Music: FC = () => {
   const handleEnableWithIntro = () => {
     localStorage.setItem("musicEnabled", "true");
     localStorage.setItem("replayIntro", "true");
-    window.location.reload();
+    audioPlayer.unlock();
+    dispatch(closeModal());
+    restartIntro();
   };
 
   const handleDisable = () => {
@@ -35,7 +41,9 @@ export const Music: FC = () => {
 
   const handleReplayIntro = () => {
     localStorage.setItem("replayIntro", "true");
-    window.location.reload();
+    audioPlayer.unlock();
+    dispatch(closeModal());
+    restartIntro();
   };
 
   if (!active) {
@@ -54,9 +62,10 @@ export const Music: FC = () => {
   }
 
   const handleBlockedReplayIntro = () => {
-    audioPlayer.tryPlay();
     localStorage.setItem("replayIntro", "true");
-    window.location.reload();
+    audioPlayer.unlock();
+    dispatch(closeModal());
+    restartIntro();
   };
 
   if (blocked) {
@@ -65,7 +74,7 @@ export const Music: FC = () => {
         <BalatroPanel title="MUSIC">
           <Content>
             <BalatroText variant="body">Browser blocked the music — click to enable it now</BalatroText>
-            <BalatroButton color="green" onClick={() => { audioPlayer.tryPlay(); dispatch(closeModal()); }}>
+            <BalatroButton color="green" onClick={() => { audioPlayer.start(); dispatch(closeModal()); }}>
               Let&apos;s go!
             </BalatroButton>
             <BalatroButton color="blue" onClick={handleBlockedReplayIntro}>

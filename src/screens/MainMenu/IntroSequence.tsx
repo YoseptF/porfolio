@@ -63,7 +63,10 @@ const SkipHint = styled.div`
   top: 8px;
   right: 12px;
   font-family: ${theme.font.family};
-  font-size: 0.85rem;
+  font-size: 2.5rem;
+  @media (max-width: 600px) {
+    font-size: 1.5rem;
+  }
   color: rgba(255, 255, 255, 0.85);
   text-align: right;
   line-height: 1.4;
@@ -95,14 +98,14 @@ export const IntroSequence: FC<IntroSequenceProps> = ({
   phaseRef.current = phase;
 
   useEffect(() => {
-    const audio = new Audio('/music/initial_intro_sound.mp3');
+    const audio = new Audio("/music/initial_intro_sound.mp3");
     introAudioRef.current = audio;
 
     const fallback = setTimeout(() => {
       setIntroDuration(BURN_CARD_OUT_DURATION_MS);
     }, 2000);
 
-    audio.addEventListener('loadedmetadata', () => {
+    audio.addEventListener("loadedmetadata", () => {
       clearTimeout(fallback);
       const burnOutMs = Math.max(audio.duration * 1000 - 800 - 700, 1000);
       setIntroDuration(burnOutMs);
@@ -128,7 +131,6 @@ export const IntroSequence: FC<IntroSequenceProps> = ({
       return next;
     });
   }, [doSkip]);
-
 
   // white-flash → animate clip circle → reveal
   useEffect(() => {
@@ -179,9 +181,11 @@ export const IntroSequence: FC<IntroSequenceProps> = ({
 
   // Canvas fades in at burn-out start, then fades out as the flash expands
   const bgOpacity =
-    phase === 'burn-out' ? Math.min(burnProgress / 0.08, 1) :
-    phase === 'white-flash' ? Math.max(1 - flashProgress * 2, 0) :
-    0;
+    phase === "burn-out"
+      ? Math.min(burnProgress / 0.08, 1)
+      : phase === "white-flash"
+        ? Math.max(1 - flashProgress * 2, 0)
+        : 0;
   const swirlOpacity = bgOpacity;
 
   const s = burnProgress;
@@ -215,10 +219,16 @@ export const IntroSequence: FC<IntroSequenceProps> = ({
           ? { background: makeSunGlow(13, 5) }
           : {};
 
-  const overlayOpacity = phase === 'reveal' ? revealOpacity : 1;
+  const overlayOpacity = phase === "reveal" ? revealOpacity : 1;
 
   return (
-    <Overlay onClick={handleClick} style={{ opacity: overlayOpacity, transition: phase === 'reveal' ? 'opacity 0.65s ease-out' : 'none' }}>
+    <Overlay
+      onClick={handleClick}
+      style={{
+        opacity: overlayOpacity,
+        transition: phase === "reveal" ? "opacity 0.65s ease-out" : "none",
+      }}
+    >
       <BurnOutFilter
         active={phase === "burn-out" && introDuration !== null}
         durationMs={introDuration ?? BURN_CARD_OUT_DURATION_MS}

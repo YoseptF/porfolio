@@ -3,6 +3,9 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import {
   SWIRL_CARD_COUNT,
+  SWIRL_CARD_COUNT_INITIAL,
+  SWIRL_INITIAL_WINDOW_SECONDS,
+  SWIRL_SPREAD_SECONDS,
   SWIRL_JOKER_COUNT,
   SWIRL_Z_START,
   SWIRL_Z_END,
@@ -57,15 +60,22 @@ export const SwirlCards: FC<SwirlCardsProps> = ({ opacity }) => {
   const cardStates = useRef<CardState[]>([]);
 
   useEffect(() => {
-    cardStates.current = Array.from({ length: SWIRL_CARD_COUNT }, (_, i) => ({
-      // Random stagger delay so cards don't arrive in a convoy
-      t: -(i / SWIRL_CARD_COUNT) * (0.5 + Math.random()),
-      // Fully random entry angle — each card comes from a different edge
-      angle: Math.random() * Math.PI * 2,
-      speed: SWIRL_SPEED_BASE + Math.random() * SWIRL_SPEED_VARIANCE,
-      tumbleAngle: Math.random() * Math.PI * 2,
-      tumbleSpeed: (Math.random() < 0.5 ? 1 : -1) * (1.2 + Math.random() * 2.5),
-    }));
+    cardStates.current = Array.from({ length: SWIRL_CARD_COUNT }, (_, i) => {
+      const speed = SWIRL_SPEED_BASE + Math.random() * SWIRL_SPEED_VARIANCE;
+
+      // First batch enters within the initial window; later cards trickle in evenly across the full intro
+      const delaySecs = i < SWIRL_CARD_COUNT_INITIAL
+        ? (i / SWIRL_CARD_COUNT_INITIAL) * SWIRL_INITIAL_WINDOW_SECONDS + Math.random() * 0.2
+        : SWIRL_INITIAL_WINDOW_SECONDS + ((i - SWIRL_CARD_COUNT_INITIAL) / (SWIRL_CARD_COUNT - SWIRL_CARD_COUNT_INITIAL)) * (SWIRL_SPREAD_SECONDS - SWIRL_INITIAL_WINDOW_SECONDS) + Math.random() * 0.5;
+
+      return {
+        t: -delaySecs * speed,
+        angle: Math.random() * Math.PI * 2,
+        speed,
+        tumbleAngle: Math.random() * Math.PI * 2,
+        tumbleSpeed: (Math.random() < 0.5 ? 1 : -1) * (1.2 + Math.random() * 2.5),
+      };
+    });
   }, []);
 
   useFrame((_state, delta) => {

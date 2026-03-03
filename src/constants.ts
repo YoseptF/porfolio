@@ -6,7 +6,10 @@ export const BURN_IN_AFTER_INTRO_DELAY_MS = 2000;
 export const BURN_CARD_DURATION_MS = 4800;
 export const BURN_CARD_OUT_DURATION_MS = 9600;
 
-export const SWIRL_CARD_COUNT = 43;
+export const SWIRL_CARD_COUNT_INITIAL = 12;
+export const SWIRL_CARD_COUNT = 150;
+export const SWIRL_INITIAL_WINDOW_SECONDS = 2;
+export const SWIRL_SPREAD_SECONDS = 9.6;
 export const SWIRL_JOKER_COUNT = 12;
 export const SWIRL_Z_START = 4.2;
 export const SWIRL_Z_END = -15.0;
