@@ -11,7 +11,7 @@ const ButtonList = styled.div`
 `
 
 const TerrariaBtn = styled.button`
-  font-family: 'm6x11plus', sans-serif;
+  font-family: 'Andy Bold', sans-serif;
   font-size: 32px;
   color: #e8d080;
   background: none;

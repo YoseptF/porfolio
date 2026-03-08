@@ -13,7 +13,7 @@ const Bar = styled.div`
 `
 
 const Version = styled.span`
-  font-family: 'm6x11plus', sans-serif;
+  font-family: 'Andy Bold', sans-serif;
   font-size: 14px;
   color: #aaa;
 `
