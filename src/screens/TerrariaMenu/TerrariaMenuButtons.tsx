@@ -1,0 +1,50 @@
+import { type FC } from 'react'
+import styled from 'styled-components'
+import { useAppDispatch } from '../../store/hooks'
+import { openModal } from '../../store/slices/navigation'
+
+const ButtonList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+`
+
+const TerrariaBtn = styled.button`
+  font-family: 'Andy', 'Andy Bold', sans-serif;
+  font-size: 28px;
+  color: #e8d080;
+  background: none;
+  border: none;
+  padding: 2px 8px;
+  cursor: pointer;
+  text-shadow:
+    2px 2px 0 #000,
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000;
+  transition: color 0.1s, text-shadow 0.1s;
+
+  &:hover {
+    color: #fff8a0;
+    text-shadow:
+      2px 2px 0 #000,
+      -1px -1px 0 #000,
+      1px -1px 0 #000,
+      -1px 1px 0 #000,
+      0 0 12px rgba(255, 240, 100, 0.8);
+  }
+`
+
+export const TerrariaMenuButtons: FC = () => {
+  const dispatch = useAppDispatch()
+
+  return (
+    <ButtonList>
+      <TerrariaBtn onClick={() => dispatch(openModal('play'))}>Play</TerrariaBtn>
+      <TerrariaBtn onClick={() => dispatch(openModal('about'))}>About</TerrariaBtn>
+      <TerrariaBtn onClick={() => dispatch(openModal('contact'))}>Contact</TerrariaBtn>
+      <TerrariaBtn onClick={() => dispatch(openModal('theme'))}>Style</TerrariaBtn>
+    </ButtonList>
+  )
+}

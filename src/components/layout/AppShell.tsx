@@ -2,7 +2,7 @@ import { type FC, useEffect, useRef } from 'react'
 import { useTransition, animated } from '@react-spring/web'
 import styled from 'styled-components'
 import { useAppSelector, useAppDispatch } from '../../store/hooks'
-import { selectCurrentScreen, selectActiveModal, closeModal } from '../../store/slices/navigation'
+import { selectCurrentScreen, selectActiveModal, selectMenuTheme, closeModal } from '../../store/slices/navigation'
 import { audioPlayer, isMusicEnabled } from '../../services/audioPlayer'
 import { MainMenu, shouldPlayIntro } from '../../screens/MainMenu/index'
 import { About } from '../../screens/About'
@@ -10,18 +10,8 @@ import { Contact } from '../../screens/Contact'
 import { Skills } from '../../screens/Skills'
 import { PlayModal } from '../../screens/Play'
 import { Music } from '../../screens/Music'
-
-const screenComponents: Record<string, FC> = {
-  menu: MainMenu,
-}
-
-const modalComponents: Record<string, FC> = {
-  about: About,
-  contact: Contact,
-  skills: Skills,
-  play: PlayModal,
-  music: Music,
-}
+import { TerrariaMenu } from '../../screens/TerrariaMenu'
+import { ThemeSelector } from '../../screens/ThemeSelector'
 
 const Container = styled.div`
   position: fixed;
@@ -51,10 +41,20 @@ const ModalBackdrop = styled.div`
   }
 `
 
+const modalComponents: Record<string, FC> = {
+  about: About,
+  contact: Contact,
+  skills: Skills,
+  play: PlayModal,
+  music: Music,
+  theme: ThemeSelector,
+}
+
 export const AppShell: FC = () => {
   const dispatch = useAppDispatch()
   const currentScreen = useAppSelector(selectCurrentScreen)
   const activeModal = useAppSelector(selectActiveModal)
+  const menuTheme = useAppSelector(selectMenuTheme)
   const musicStarted = useRef(false)
 
   useEffect(() => {
@@ -64,6 +64,12 @@ export const AppShell: FC = () => {
     musicStarted.current = true;
     audioPlayer.start();
   }, [])
+
+  const menuScreen = menuTheme === 'terraria' ? TerrariaMenu : MainMenu
+
+  const screenComponents: Record<string, FC> = {
+    menu: menuScreen,
+  }
 
   const screenTransitions = useTransition(currentScreen, {
     from: { opacity: 0 },
@@ -88,7 +94,7 @@ export const AppShell: FC = () => {
         const ScreenComponent = screenComponents[screen]
         if (!ScreenComponent) return null
         return (
-          <AnimatedScreen style={style}>
+          <AnimatedScreen style={style} key={`${screen}-${menuTheme}`}>
             <ScreenComponent />
           </AnimatedScreen>
         )

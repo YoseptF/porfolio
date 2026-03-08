@@ -221,9 +221,9 @@ export const MainMenu: FC = () => {
           </MenuButton>
           <MenuButton
             color="green"
-            onClick={() => dispatch(openModal("skills"))}
+            onClick={() => dispatch(openModal("theme"))}
           >
-            Skills
+            Style
           </MenuButton>
         </ButtonsContainer>
 
