@@ -29,6 +29,13 @@ const Overlay = styled.div<{ $state: OverlayState }>`
     css`animation: ${hideSplash} 0.5s ease forwards;`}
 `
 
+const BlackBase = styled.div`
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 99;
+`
+
 const Layer = styled.img`
   position: fixed;
   inset: 0;
@@ -36,6 +43,11 @@ const Layer = styled.img`
   height: 100%;
   object-fit: cover;
   z-index: 100;
+`
+
+// Text/title layer must always be fully visible — contain so it's never cropped
+const TextLayer = styled(Layer)`
+  object-fit: contain;
 `
 
 const SPLASH_COUNT = 10
@@ -67,9 +79,10 @@ export const SplashScreen: FC<Props> = ({ onComplete }) => {
 
   return (
     <>
+      <BlackBase />
       <Layer src={`/terraria/splash/Splash_${splashN}_0.webp`} alt="" />
       <Layer src={`/terraria/splash/Splash_${splashN}_1.webp`} alt="" />
-      <Layer src={`/terraria/splash/Splash_${splashN}_2.webp`} alt="" />
+      <TextLayer src={`/terraria/splash/Splash_${splashN}_2.webp`} alt="" />
       <Overlay $state={state} />
     </>
   )

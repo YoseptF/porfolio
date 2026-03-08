@@ -2,7 +2,7 @@ import { type FC, useState, useEffect, useRef, useCallback } from 'react'
 import styled from 'styled-components'
 import { useDayNightCycle } from './useDayNightCycle'
 import { useAutoScroll } from './useAutoScroll'
-import { useCelestialBodies } from './useCelestialBodies'
+import { useCelestialBodies, sunXToT } from './useCelestialBodies'
 import { getRandomBiome } from './biomes'
 import { ParallaxBackground } from './ParallaxBackground'
 import { SunMoon } from './SunMoon'
@@ -21,19 +21,16 @@ const Wrapper = styled.div<{ $visible: boolean }>`
   transition: opacity 0.6s ease;
 `
 
-const Sky = styled.div<{ $color: string; $ready: boolean }>`
+const Sky = styled.div`
   position: absolute;
   inset: 0;
-  background: ${({ $color }) => $color};
-  transition: ${({ $ready }) => ($ready ? 'background 8s ease' : 'none')};
 `
 
-const SceneLight = styled.div<{ $color: string }>`
+const SceneLight = styled.div`
   position: absolute;
   inset: 0;
   z-index: 2;
   pointer-events: none;
-  background: ${({ $color }) => $color};
   mix-blend-mode: multiply;
 `
 
@@ -46,6 +43,7 @@ const LogoArea = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  pointer-events: none;
 `
 
 const ButtonArea = styled.div`
@@ -119,19 +117,19 @@ const SCENE_LIGHT_STOPS: ColorStop[] = [
 ]
 
 const SCENE_LIGHT_ALPHA_STOPS: NumStop[] = [
-  [0, 0.20],    // dawn
+  [0, 0.40],    // dawn
   [0.25, 0.00], // noon
-  [0.5, 0.30],  // dusk
-  [0.75, 0.60], // night
-  [1, 0.20],
+  [0.5, 0.50],  // dusk
+  [0.75, 0.75], // night
+  [1, 0.40],
 ]
 
 const BRIGHTNESS_STOPS: NumStop[] = [
-  [0, 0.75],    // dawn
+  [0, 0.60],    // dawn
   [0.25, 1.10], // noon
-  [0.5, 0.65],  // dusk
-  [0.75, 0.28], // night
-  [1, 0.75],
+  [0.5, 0.50],  // dusk
+  [0.75, 0.18], // night
+  [1, 0.60],
 ]
 
 const hexToRgba = (hex: string, alpha: number): string => {
@@ -154,13 +152,12 @@ const interpolateSky = (
 }
 
 export const TerrariaMenu: FC = () => {
-  const { time, phase } = useDayNightCycle()
+  const { time, phase, seekTo } = useDayNightCycle()
   const scrollOffset = useAutoScroll()
-  const { sunX, sunY, moonX, moonY, moonPhase, isDragging, onPointerDown, onPointerMove, onPointerUp } =
-    useCelestialBodies(time)
+  const { sunX, sunY, moonX, moonY, isDragging, isReturning, onPointerDown, onPointerMove, onPointerUp } =
+    useCelestialBodies(time, seekTo, phase)
   const [splashActive, setSplashActive] = useState(true)
   const onSplashComplete = useCallback(() => setSplashActive(false), [])
-  const [skyReady, setSkyReady] = useState(false)
   const [biome, setBiome] = useState(() => getRandomBiome('day'))
   const prevPhaseRef = useRef(phase)
 
@@ -171,27 +168,25 @@ export const TerrariaMenu: FC = () => {
     }
   }, [phase])
 
-  useEffect(() => { setSkyReady(true) }, [])
-
   useEffect(() => {
-    const handler = () => {
-      // Reset handled by always-showing splash on theme change
-    }
+    const handler = () => {}
     window.addEventListener('portfolio:theme-changed', handler)
     return () => window.removeEventListener('portfolio:theme-changed', handler)
   }, [])
 
+  const lightingT = sunXToT(sunX, phase)
+
   const skyColor = interpolateSky(time, biome.skyColor)
-  const sceneLightColor = interpolateColor(time, SCENE_LIGHT_STOPS)
-  const sceneLightAlpha = interpolateNum(time, SCENE_LIGHT_ALPHA_STOPS)
-  const brightness = interpolateNum(time, BRIGHTNESS_STOPS)
+  const sceneLightColor = interpolateColor(lightingT, SCENE_LIGHT_STOPS)
+  const sceneLightAlpha = interpolateNum(lightingT, SCENE_LIGHT_ALPHA_STOPS)
+  const brightness = interpolateNum(lightingT, BRIGHTNESS_STOPS)
 
   return (
     <>
       {splashActive && <SplashScreen onComplete={onSplashComplete} />}
 
       <Wrapper $visible={!splashActive}>
-        <Sky $color={skyColor} $ready={skyReady} />
+        <Sky style={{ background: skyColor }} />
 
         <Stars phase={phase} />
 
@@ -201,7 +196,7 @@ export const TerrariaMenu: FC = () => {
           brightness={brightness}
         />
 
-        <SceneLight $color={hexToRgba(sceneLightColor, sceneLightAlpha)} />
+        <SceneLight style={{ background: hexToRgba(sceneLightColor, sceneLightAlpha) }} />
 
         <Clouds phase={phase} />
 
@@ -210,10 +205,10 @@ export const TerrariaMenu: FC = () => {
           sunY={sunY}
           moonX={moonX}
           moonY={moonY}
-          moonPhase={moonPhase}
           time={time}
           phase={phase}
           isDragging={isDragging}
+          isReturning={isReturning}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}

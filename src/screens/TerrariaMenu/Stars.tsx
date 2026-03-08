@@ -6,7 +6,14 @@ const twinkle = keyframes`
   50% { opacity: 0.2; }
 `
 
-const Star = styled.div<{ $left: number; $top: number; $size: number; $delay: number; $visible: boolean }>`
+const Star = styled.div<{
+  $left: number
+  $top: number
+  $size: number
+  $duration: number
+  $delay: number
+  $visible: boolean
+}>`
   position: absolute;
   left: ${({ $left }) => $left}%;
   top: ${({ $top }) => $top}%;
@@ -18,11 +25,11 @@ const Star = styled.div<{ $left: number; $top: number; $size: number; $delay: nu
   transition: opacity 2s ease;
   pointer-events: none;
   z-index: 3;
-  ${({ $visible }) =>
+  ${({ $visible, $duration, $delay }) =>
     $visible &&
     css`
-      animation: ${twinkle} ${2 + Math.random() * 3}s ease-in-out infinite;
-      animation-delay: ${-Math.random() * 4}s;
+      animation: ${twinkle} ${$duration}s ease-in-out infinite;
+      animation-delay: ${$delay}s;
     `}
 `
 
@@ -34,6 +41,7 @@ type StarDef = {
   left: number
   top: number
   size: number
+  duration: number
   delay: number
 }
 
@@ -44,7 +52,8 @@ export const Stars: FC<Props> = ({ phase }) => {
         left: Math.random() * 100,
         top: Math.random() * 70,
         size: 1 + Math.random() * 2,
-        delay: Math.random() * 4,
+        duration: 2 + Math.random() * 3,
+        delay: -(Math.random() * 4),
       })),
     [],
   )
@@ -57,6 +66,7 @@ export const Stars: FC<Props> = ({ phase }) => {
           $left={s.left}
           $top={s.top}
           $size={s.size}
+          $duration={s.duration}
           $delay={s.delay}
           $visible={phase === 'night'}
         />

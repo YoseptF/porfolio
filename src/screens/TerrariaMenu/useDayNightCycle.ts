@@ -5,33 +5,38 @@ type Phase = 'day' | 'night'
 type DayNightCycle = {
   time: number
   phase: Phase
+  seekTo: (t: number) => void
   setTimeForTest: (t: number) => void
 }
 
-const FULL_CYCLE_MS = 10 * 60 * 1000 // 10 real minutes = 1 full day
+const FULL_CYCLE_MS = 60 * 1000 // 1 real minute = 1 full day
 
 export const useDayNightCycle = (): DayNightCycle => {
-  const [time, setTime] = useState(0.1) // start at early morning
-  const [phase, setPhase] = useState<Phase>('day')
+  const [time, setTime] = useState(0.1)
   const rafRef = useRef<number>(0)
-  const lastTimeRef = useRef<number | null>(null)
+  // Absolute start ref: startTimeRef = now - t * FULL_CYCLE_MS
+  // Each tick: time = (now - startTimeRef) / FULL_CYCLE_MS % 1
+  const startTimeRef = useRef<number | null>(null)
 
-  const setTimeForTest = useCallback((t: number) => {
+  // Phase derived directly from time — no separate state needed
+  const phase: Phase = time >= 0.5 && time < 1.0 ? 'night' : 'day'
+
+  const seekTo = useCallback((t: number) => {
+    const now = performance.now()
+    startTimeRef.current = now - t * FULL_CYCLE_MS
     setTime(t)
-    setPhase(t >= 0.5 && t < 1.0 ? 'night' : 'day')
   }, [])
+
+  // For tests: same as seekTo
+  const setTimeForTest = seekTo
 
   useEffect(() => {
     const tick = (now: number) => {
-      if (lastTimeRef.current !== null) {
-        const delta = now - lastTimeRef.current
-        setTime(prev => {
-          const next = (prev + delta / FULL_CYCLE_MS) % 1
-          setPhase(next >= 0.5 ? 'night' : 'day')
-          return next
-        })
+      if (startTimeRef.current === null) {
+        startTimeRef.current = now - 0.1 * FULL_CYCLE_MS
       }
-      lastTimeRef.current = now
+      const next = ((now - startTimeRef.current) / FULL_CYCLE_MS) % 1
+      setTime(next)
       rafRef.current = requestAnimationFrame(tick)
     }
 
@@ -39,5 +44,5 @@ export const useDayNightCycle = (): DayNightCycle => {
     return () => cancelAnimationFrame(rafRef.current)
   }, [])
 
-  return { time, phase, setTimeForTest }
+  return { time, phase, seekTo, setTimeForTest }
 }

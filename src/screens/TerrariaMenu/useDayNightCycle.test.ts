@@ -51,4 +51,22 @@ describe('useDayNightCycle', () => {
     })
     expect(result.current.phase).toBe('day')
   })
+
+  it('seekTo sets time and phase immediately', () => {
+    const { result } = renderHook(() => useDayNightCycle())
+
+    act(() => {
+      result.current.seekTo(0.8)
+    })
+
+    expect(result.current.time).toBe(0.8)
+    expect(result.current.phase).toBe('night')
+
+    act(() => {
+      result.current.seekTo(0.1)
+    })
+
+    expect(result.current.time).toBe(0.1)
+    expect(result.current.phase).toBe('day')
+  })
 })
