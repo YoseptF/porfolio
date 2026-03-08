@@ -65,4 +65,13 @@ describe('SplashScreen', () => {
     const style = window.getComputedStyle(overlay!)
     expect(style.background || style.backgroundColor).not.toBe('')
   })
+
+  it('fires regardless of localStorage state', () => {
+    localStorage.setItem('terrariaSplashPlayed', 'true')
+    const onComplete = vi.fn()
+    render(<SplashScreen onComplete={onComplete} />)
+
+    act(() => { vi.advanceTimersByTime(3000) })
+    expect(onComplete).toHaveBeenCalledOnce()
+  })
 })

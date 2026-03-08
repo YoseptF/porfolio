@@ -1,29 +1,41 @@
 import { type FC, useState, useEffect, useRef } from 'react'
 import styled, { keyframes, css } from 'styled-components'
 
-const fadeOut = keyframes`
+// Overlay fades OUT to reveal splash images underneath
+const revealSplash = keyframes`
   from { opacity: 1; }
   to { opacity: 0; }
 `
 
-const Overlay = styled.div<{ $fading: boolean }>`
+// Overlay fades IN to black before returning to menu
+const hideSplash = keyframes`
+  from { opacity: 0; }
+  to { opacity: 1; }
+`
+
+type OverlayState = 'reveal' | 'hold' | 'hide'
+
+const Overlay = styled.div<{ $state: OverlayState }>`
   position: fixed;
   inset: 0;
-  z-index: 100;
+  z-index: 101;
   background: #000;
-  ${({ $fading }) =>
-    $fading &&
-    css`
-      animation: ${fadeOut} 0.5s ease forwards;
-    `}
+  ${({ $state }) =>
+    $state === 'reveal' &&
+    css`animation: ${revealSplash} 0.5s ease forwards;`}
+  ${({ $state }) => $state === 'hold' && css`opacity: 0;`}
+  ${({ $state }) =>
+    $state === 'hide' &&
+    css`animation: ${hideSplash} 0.5s ease forwards;`}
 `
 
 const Layer = styled.img`
-  position: absolute;
+  position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  z-index: 100;
 `
 
 const SPLASH_COUNT = 10
@@ -33,7 +45,7 @@ type Props = {
 }
 
 export const SplashScreen: FC<Props> = ({ onComplete }) => {
-  const [fading, setFading] = useState(false)
+  const [state, setState] = useState<OverlayState>('reveal')
   const [splashN] = useState(() => Math.floor(Math.random() * SPLASH_COUNT) + 1)
   const onCompleteRef = useRef(onComplete)
 
@@ -42,24 +54,23 @@ export const SplashScreen: FC<Props> = ({ onComplete }) => {
   })
 
   useEffect(() => {
-    const fadeTimer = setTimeout(() => setFading(true), 2500)
-    const doneTimer = setTimeout(() => {
-      localStorage.setItem('terrariaSplashPlayed', 'true')
-      onCompleteRef.current()
-    }, 3000)
+    const holdTimer = setTimeout(() => setState('hold'), 500)
+    const hideTimer = setTimeout(() => setState('hide'), 2500)
+    const doneTimer = setTimeout(() => onCompleteRef.current(), 3000)
     return () => {
-      clearTimeout(fadeTimer)
+      clearTimeout(holdTimer)
+      clearTimeout(hideTimer)
       clearTimeout(doneTimer)
     }
-    // empty deps: run once on mount only
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
-    <Overlay $fading={fading}>
+    <>
       <Layer src={`/terraria/splash/Splash_${splashN}_0.webp`} alt="" />
       <Layer src={`/terraria/splash/Splash_${splashN}_1.webp`} alt="" />
       <Layer src={`/terraria/splash/Splash_${splashN}_2.webp`} alt="" />
-    </Overlay>
+      <Overlay $state={state} />
+    </>
   )
 }

@@ -1,4 +1,4 @@
-import { type FC, useState, useEffect } from 'react'
+import { type FC, useState } from 'react'
 import styled, { keyframes } from 'styled-components'
 
 const FRAMES = [
@@ -20,8 +20,7 @@ const Wrapper = styled.div`
   max-width: min(480px, 85vw);
 `
 
-const LogoImg = styled.img<{ $visible: boolean }>`
-  display: ${({ $visible }) => ($visible ? 'block' : 'none')};
+const LogoImg = styled.img`
   width: 100%;
   height: auto;
   animation: ${wobble} 3s ease-in-out infinite;
@@ -29,20 +28,11 @@ const LogoImg = styled.img<{ $visible: boolean }>`
 `
 
 export const TerrariaLogo: FC = () => {
-  const [frame, setFrame] = useState(0)
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      setFrame(prev => (prev + 1) % FRAMES.length)
-    }, 83) // ~12fps
-    return () => clearInterval(id)
-  }, [])
+  const [frame] = useState(() => Math.floor(Math.random() * FRAMES.length))
 
   return (
     <Wrapper>
-      {FRAMES.map((src, i) => (
-        <LogoImg key={src} src={src} alt={i === 0 ? 'Terraria' : ''} $visible={i === frame} />
-      ))}
+      <LogoImg src={FRAMES[frame]} alt="Terraria" />
     </Wrapper>
   )
 }

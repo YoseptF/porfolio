@@ -3,8 +3,8 @@ import styled from 'styled-components'
 
 type LayerProps = {
   $src: string
-  $speed: number
   $offsetX: number
+  $speedFactor: number
 }
 
 const Layer = styled.div<LayerProps>`
@@ -13,25 +13,32 @@ const Layer = styled.div<LayerProps>`
   background-image: url(${({ $src }) => $src});
   background-size: auto 100%;
   background-repeat: repeat-x;
-  background-position: center bottom;
-  transform: translateX(${({ $speed, $offsetX }) => $speed * $offsetX * 30}px);
-  will-change: transform;
+  background-position-x: ${({ $offsetX, $speedFactor }) => $offsetX * $speedFactor}px;
+  background-position-y: bottom;
+  will-change: background-position-x;
+`
+
+const Container = styled.div<{ $brightness: number }>`
+  position: absolute;
+  inset: 0;
+  filter: brightness(${({ $brightness }) => $brightness});
 `
 
 type Props = {
   layers: string[]
-  parallaxX: number
+  offsetX: number
+  brightness: number
 }
 
-export const ParallaxBackground: FC<Props> = ({ layers, parallaxX }) => (
-  <>
+export const ParallaxBackground: FC<Props> = ({ layers, offsetX, brightness }) => (
+  <Container $brightness={brightness}>
     {layers.map((src, i) => (
       <Layer
         key={src}
         $src={src}
-        $speed={(i + 1) * 0.5}
-        $offsetX={parallaxX}
+        $offsetX={offsetX}
+        $speedFactor={(i + 1) * 0.6}
       />
     ))}
-  </>
+  </Container>
 )

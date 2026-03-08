@@ -7,12 +7,12 @@ const ButtonList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
-  align-items: flex-start;
+  align-items: center;
 `
 
 const TerrariaBtn = styled.button`
-  font-family: 'Andy', 'Andy Bold', sans-serif;
-  font-size: 28px;
+  font-family: 'm6x11plus', sans-serif;
+  font-size: 32px;
   color: #e8d080;
   background: none;
   border: none;

@@ -1,37 +1,46 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 
-type DraggableSun = {
+export type CelestialBodies = {
   sunX: number
   sunY: number
+  moonX: number
+  moonY: number
+  moonPhase: number
   isDragging: boolean
   onPointerDown: (e: React.PointerEvent) => void
   onPointerMove: (e: React.PointerEvent) => void
   onPointerUp: () => void
 }
 
-// Arc: sun travels from x=0.05 to x=0.95, with peak height at x=0.5
-// time 0=dawn(left), 0.5=dusk(right) for day phase
-const timeToArcX = (t: number): number => {
-  // t in [0, 0.5] for day, map to [0.05, 0.95]
+// time 0=dawn(left edge), 0.5=dusk(right edge) for day phase
+const timeToSunX = (t: number): number => {
   const dayT = Math.min(t / 0.5, 1)
   return 0.05 + dayT * 0.9
 }
 
-const arcXToY = (x: number): number => {
-  // Parabola: highest point at x=0.5 viewport
+// Inverted parabola: LOW at edges (horizon=0.40), HIGH at center (noon=0.08)
+export const arcXToY = (x: number): number => {
   const normalized = (x - 0.05) / 0.9
-  return 0.1 + 0.35 * (1 - Math.pow((normalized - 0.5) * 2, 2))
+  const heightFactor = 1 - Math.pow((normalized - 0.5) * 2, 2)
+  return 0.40 - 0.32 * heightFactor
 }
 
-export const useDraggableSun = (time: number): DraggableSun => {
+// time 0.5→1.0 maps to x: 0.95→0.05 (right to left)
+export const timeToMoonX = (t: number): number =>
+  0.95 - ((t - 0.5) / 0.5) * 0.9
+
+export const useCelestialBodies = (time: number): CelestialBodies => {
   const [isDragging, setIsDragging] = useState(false)
   const [overrideX, setOverrideX] = useState<number | null>(null)
   const returnTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const moonPhaseRef = useRef(Math.floor(Math.random() * 9))
 
-  const cycleSunX = timeToArcX(time)
-
+  const cycleSunX = timeToSunX(time)
   const sunX = overrideX ?? cycleSunX
   const sunY = arcXToY(sunX)
+
+  const moonX = timeToMoonX(Math.max(0.5, Math.min(1.0, time)))
+  const moonY = arcXToY(moonX)
 
   useEffect(() => {
     if (!isDragging && overrideX !== null) {
@@ -59,5 +68,15 @@ export const useDraggableSun = (time: number): DraggableSun => {
     setIsDragging(false)
   }, [])
 
-  return { sunX, sunY, isDragging, onPointerDown, onPointerMove, onPointerUp }
+  return {
+    sunX,
+    sunY,
+    moonX,
+    moonY,
+    moonPhase: moonPhaseRef.current,
+    isDragging,
+    onPointerDown,
+    onPointerMove,
+    onPointerUp,
+  }
 }
