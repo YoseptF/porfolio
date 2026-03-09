@@ -29,7 +29,7 @@ const Sky = styled.div`
 const SceneLight = styled.div`
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: 6;
   pointer-events: none;
   mix-blend-mode: multiply;
 `
@@ -181,6 +181,10 @@ export const TerrariaMenu: FC = () => {
   const sceneLightAlpha = interpolateNum(lightingT, SCENE_LIGHT_ALPHA_STOPS)
   const brightness = interpolateNum(lightingT, BRIGHTNESS_STOPS)
 
+  // Split layers: back layers sit behind sun/moon (z 2+), front layer sits in front (z 5)
+  const backLayers = biome.layers.slice(0, -1)
+  const frontLayer = biome.layers.slice(-1)
+
   return (
     <>
       {splashActive && <SplashScreen onComplete={onSplashComplete} />}
@@ -191,14 +195,11 @@ export const TerrariaMenu: FC = () => {
         <Stars phase={phase} />
 
         <ParallaxBackground
-          layers={biome.layers}
+          layers={backLayers}
           offsetX={scrollOffset}
           brightness={brightness}
+          zIndexStart={2}
         />
-
-        <SceneLight style={{ background: hexToRgba(sceneLightColor, sceneLightAlpha) }} />
-
-        <Clouds phase={phase} />
 
         <SunMoon
           sunX={sunX}
@@ -213,6 +214,18 @@ export const TerrariaMenu: FC = () => {
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
         />
+
+        <ParallaxBackground
+          layers={frontLayer}
+          offsetX={scrollOffset}
+          brightness={brightness}
+          zIndexStart={5}
+          layerIndexOffset={backLayers.length}
+        />
+
+        <SceneLight style={{ background: hexToRgba(sceneLightColor, sceneLightAlpha) }} />
+
+        <Clouds phase={phase} />
 
         <LogoArea>
           <TerrariaLogo />

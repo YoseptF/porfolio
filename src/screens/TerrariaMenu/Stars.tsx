@@ -24,7 +24,7 @@ const Star = styled.div<{
   opacity: ${({ $visible }) => ($visible ? 1 : 0)};
   transition: opacity 2s ease;
   pointer-events: none;
-  z-index: 3;
+  z-index: 1;
   ${({ $visible, $duration, $delay }) =>
     $visible &&
     css`

@@ -9,7 +9,7 @@ const CloudImg = styled.img<{ $y: number }>`
   height: 80px;
   image-rendering: pixelated;
   pointer-events: none;
-  z-index: 3;
+  z-index: 7;
 `
 
 type CloudDef = {
