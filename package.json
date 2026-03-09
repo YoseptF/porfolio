@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
-    "env:dev-local": "cross-env NODE_ENV=development"
+    "env:dev-local": "cross-env NODE_ENV=development",
+    "gen:bg": "bun scripts/gen-bg-manifest.ts"
   },
   "dependencies": {
     "@react-spring/three": "^10.0.3",
