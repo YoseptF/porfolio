@@ -6,8 +6,6 @@ const FRAMES = [
   '/terraria/logo/Logo2.webp',
   '/terraria/logo/Logo3.webp',
   '/terraria/logo/Logo4.webp',
-  '/terraria/logo/Logo5.webp',
-  '/terraria/logo/Logo6.webp',
 ]
 
 const wobble = keyframes`

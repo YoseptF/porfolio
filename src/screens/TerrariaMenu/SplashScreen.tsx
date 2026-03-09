@@ -45,6 +45,20 @@ const Layer = styled.img`
   z-index: 100;
 `
 
+const SpriteLayer = styled.img`
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  height: 28vh;
+  width: auto;
+  z-index: 100;
+  image-rendering: pixelated;
+
+  @media (min-width: 768px) {
+    height: 55vh;
+  }
+`
+
 // Text/title layer must always be fully visible — contain so it's never cropped
 const TextLayer = styled(Layer)`
   object-fit: contain;
@@ -81,7 +95,7 @@ export const SplashScreen: FC<Props> = ({ onComplete }) => {
     <>
       <BlackBase />
       <Layer src={`/terraria/splash/Splash_${splashN}_0.webp`} alt="" />
-      <Layer src={`/terraria/splash/Splash_${splashN}_1.webp`} alt="" />
+      <SpriteLayer src={`/terraria/splash/Splash_${splashN}_1.webp`} alt="" />
       <TextLayer src={`/terraria/splash/Splash_${splashN}_2.webp`} alt="" />
       <Overlay $state={state} />
     </>
