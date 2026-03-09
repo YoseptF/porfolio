@@ -34,6 +34,20 @@ const SceneLight = styled.div`
   mix-blend-mode: multiply;
 `
 
+const DebugOverlay = styled.div`
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-family: monospace;
+  font-size: 11px;
+  padding: 6px 10px;
+  border-radius: 4px;
+  line-height: 1.6;
+`
+
 const LogoArea = styled.div`
   position: absolute;
   top: 4%;
@@ -152,11 +166,11 @@ const interpolateSky = (
 }
 
 export const TerrariaMenu: FC = () => {
-  const { time, phase, seekTo } = useDayNightCycle()
+  const { time, phase, paused, togglePause, seekTo } = useDayNightCycle()
   const scrollOffset = useAutoScroll()
   const { sunX, sunY, moonX, moonY, isDragging, isReturning, onPointerDown, onPointerMove, onPointerUp } =
     useCelestialBodies(time, seekTo, phase)
-  const [splashActive, setSplashActive] = useState(true)
+  const [splashActive, setSplashActive] = useState(false)
   const onSplashComplete = useCallback(() => setSplashActive(false), [])
   const [biome, setBiome] = useState(() => getRandomBiome('day'))
   const prevPhaseRef = useRef(phase)
@@ -236,6 +250,19 @@ export const TerrariaMenu: FC = () => {
         </ButtonArea>
 
         <TerrariaBottomBar />
+
+        <DebugOverlay>
+          {['far', 'mid', 'near'].map((label, i) => {
+            const path = biome.layers[i]
+            const name = path?.split('/').slice(-3).join('/') ?? '–'
+            return <div key={label}><b>{label}:</b> {name}</div>
+          })}
+          <div style={{ marginTop: 4 }}>
+            <button onClick={togglePause} style={{ fontSize: 11, cursor: 'pointer' }}>
+              {paused ? '▶ resume' : '⏸ pause'}
+            </button>
+          </div>
+        </DebugOverlay>
       </Wrapper>
     </>
   )

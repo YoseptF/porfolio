@@ -1,5 +1,6 @@
 import { type FC } from 'react'
 import styled from 'styled-components'
+import { BG_LAYER_HEIGHTS, BG_LAYER_Y_POS } from '../../constants'
 
 type LayerProps = {
   $src: string
@@ -7,17 +8,18 @@ type LayerProps = {
   $speedFactor: number
   $brightness: number
   $zIndex: number
-  $heightPercent: number
+  $height: string
+  $posY: string
 }
 
 const Layer = styled.div<LayerProps>`
   position: absolute;
   inset: 0;
   background-image: url(${({ $src }) => $src});
-  background-size: auto ${({ $heightPercent }) => $heightPercent}%;
+  background-size: auto ${({ $height }) => $height};
   background-repeat: repeat-x;
   background-position-x: ${({ $offsetX, $speedFactor }) => -$offsetX * $speedFactor}px;
-  background-position-y: bottom;
+  background-position-y: ${({ $posY }) => $posY};
   will-change: background-position-x;
   filter: brightness(${({ $brightness }) => $brightness});
   z-index: ${({ $zIndex }) => $zIndex};
@@ -41,9 +43,9 @@ export const ParallaxBackground: FC<Props> = ({
 }) => (
   <>
     {layers.map((src, i) => {
-      // far=55%, mid=70%, near=85% — each depth layer is taller than the one behind it
       const totalIdx = layerIndexOffset + i
-      const heightPercent = 55 + totalIdx * 15
+      const height = BG_LAYER_HEIGHTS[totalIdx] ?? 'auto'
+      const posY = BG_LAYER_Y_POS[totalIdx] ?? 'bottom'
       return (
         <Layer
           key={src}
@@ -52,7 +54,8 @@ export const ParallaxBackground: FC<Props> = ({
           $speedFactor={(totalIdx + 1) * 0.6}
           $brightness={brightness}
           $zIndex={zIndexStart + i}
-          $heightPercent={heightPercent}
+          $height={height}
+          $posY={posY}
         />
       )
     })}

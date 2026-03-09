@@ -1,4 +1,9 @@
 export const EXPERIENCE = new Date().getFullYear() - 2019 + "+";
+
+// Terraria background parallax layers: far=0, mid=1, near=2
+export const BG_LAYER_HEIGHTS = ["950px", "750px", "640px"] as const;
+export const BG_LAYER_Y_POS = ["bottom", "bottom", "bottom"] as const;
+
 export const PROJECTS_URL = "/projects/index.json";
 
 export const BURN_TITLE_DURATION_MS = 2200;
