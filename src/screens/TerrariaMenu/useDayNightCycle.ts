@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { DAY_CYCLE_MS } from '../../constants'
 
 type Phase = 'day' | 'night'
 
@@ -11,14 +12,12 @@ type DayNightCycle = {
   setTimeForTest: (t: number) => void
 }
 
-const FULL_CYCLE_MS = 60 * 1000 // 1 real minute = 1 full day
-
 export const useDayNightCycle = (): DayNightCycle => {
-  const [time, setTime] = useState(0.1)
+  const [time, setTime] = useState(0)
   const [paused, setPaused] = useState(() => localStorage.getItem('dbg:paused') === '1')
   const rafRef = useRef<number>(0)
-  // Absolute start ref: startTimeRef = now - t * FULL_CYCLE_MS
-  // Each tick: time = (now - startTimeRef) / FULL_CYCLE_MS % 1
+  // Absolute start ref: startTimeRef = now - t * DAY_CYCLE_MS
+  // Each tick: time = (now - startTimeRef) / DAY_CYCLE_MS % 1
   const startTimeRef = useRef<number | null>(null)
   const pausedRef = useRef(localStorage.getItem('dbg:paused') === '1')
 
@@ -27,7 +26,7 @@ export const useDayNightCycle = (): DayNightCycle => {
 
   const seekTo = useCallback((t: number) => {
     const now = performance.now()
-    startTimeRef.current = now - t * FULL_CYCLE_MS
+    startTimeRef.current = now - t * DAY_CYCLE_MS
     setTime(t)
   }, [])
 
@@ -37,7 +36,7 @@ export const useDayNightCycle = (): DayNightCycle => {
       pausedRef.current = next
       localStorage.setItem('dbg:paused', next ? '1' : '0')
       if (!next) {
-        startTimeRef.current = performance.now() - time * FULL_CYCLE_MS
+        startTimeRef.current = performance.now() - time * DAY_CYCLE_MS
       }
       return next
     })
@@ -50,9 +49,9 @@ export const useDayNightCycle = (): DayNightCycle => {
     const tick = (now: number) => {
       if (!pausedRef.current) {
         if (startTimeRef.current === null) {
-          startTimeRef.current = now - 0.1 * FULL_CYCLE_MS
+          startTimeRef.current = now
         }
-        const next = ((now - startTimeRef.current) / FULL_CYCLE_MS) % 1
+        const next = ((now - startTimeRef.current) / DAY_CYCLE_MS) % 1
         setTime(next)
       }
       rafRef.current = requestAnimationFrame(tick)

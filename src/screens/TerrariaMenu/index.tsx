@@ -4,6 +4,7 @@ import { useDayNightCycle } from './useDayNightCycle'
 import { useAutoScroll } from './useAutoScroll'
 import { useCelestialBodies, sunXToT } from './useCelestialBodies'
 import { getRandomBiome } from './biomes'
+import { SCENE_LIGHT_STOPS, SCENE_LIGHT_ALPHA_STOPS, BRIGHTNESS_STOPS } from '../../constants'
 import { ParallaxBackground } from './ParallaxBackground'
 import { SunMoon } from './SunMoon'
 import { TerrariaLogo } from './TerrariaLogo'
@@ -57,7 +58,7 @@ const LogoArea = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  pointer-events: none;
+  cursor: pointer;
 `
 
 const ButtonArea = styled.div`
@@ -122,29 +123,6 @@ const interpolateNum = (time: number, stops: NumStop[]): number => {
   return lerp(from[1], to[1], t)
 }
 
-const SCENE_LIGHT_STOPS: ColorStop[] = [
-  [0, '#ff8c3c'],    // dawn: warm orange
-  [0.25, '#000000'], // noon: no overlay (black at 0 opacity via rgba — use transparent hex trick)
-  [0.5, '#c8501e'],  // dusk: dark warm
-  [0.75, '#000a28'], // night: very dark blue
-  [1, '#ff8c3c'],
-]
-
-const SCENE_LIGHT_ALPHA_STOPS: NumStop[] = [
-  [0, 0.40],    // dawn
-  [0.25, 0.00], // noon
-  [0.5, 0.50],  // dusk
-  [0.75, 0.75], // night
-  [1, 0.40],
-]
-
-const BRIGHTNESS_STOPS: NumStop[] = [
-  [0, 0.60],    // dawn
-  [0.25, 1.10], // noon
-  [0.5, 0.50],  // dusk
-  [0.75, 0.18], // night
-  [1, 0.60],
-]
 
 const hexToRgba = (hex: string, alpha: number): string => {
   const [r, g, b] = hexToRgb(hex)
@@ -170,8 +148,18 @@ export const TerrariaMenu: FC = () => {
   const scrollOffset = useAutoScroll()
   const { sunX, sunY, moonX, moonY, isDragging, isReturning, onPointerDown, onPointerMove, onPointerUp } =
     useCelestialBodies(time, seekTo, phase)
-  const [splashActive, setSplashActive] = useState(false)
+  const [splashActive, setSplashActive] = useState(true)
+  const [debugVisible, setDebugVisible] = useState(false)
+  const debugClicksRef = useRef(0)
   const onSplashComplete = useCallback(() => setSplashActive(false), [])
+
+  const onLogoClick = useCallback(() => {
+    debugClicksRef.current += 1
+    if (debugClicksRef.current >= 7) {
+      debugClicksRef.current = 0
+      setDebugVisible(v => !v)
+    }
+  }, [])
   const [biome, setBiome] = useState(() => getRandomBiome('day'))
   const prevPhaseRef = useRef(phase)
 
@@ -241,7 +229,7 @@ export const TerrariaMenu: FC = () => {
 
         <Clouds phase={phase} />
 
-        <LogoArea>
+        <LogoArea onClick={onLogoClick}>
           <TerrariaLogo />
         </LogoArea>
 
@@ -251,18 +239,20 @@ export const TerrariaMenu: FC = () => {
 
         <TerrariaBottomBar />
 
-        <DebugOverlay>
-          {['far', 'mid', 'near'].map((label, i) => {
-            const path = biome.layers[i]
-            const name = path?.split('/').slice(-3).join('/') ?? '–'
-            return <div key={label}><b>{label}:</b> {name}</div>
-          })}
-          <div style={{ marginTop: 4 }}>
-            <button onClick={togglePause} style={{ fontSize: 11, cursor: 'pointer' }}>
-              {paused ? '▶ resume' : '⏸ pause'}
-            </button>
-          </div>
-        </DebugOverlay>
+        {debugVisible && (
+          <DebugOverlay>
+            {['far', 'mid', 'near'].map((label, i) => {
+              const path = biome.layers[i]
+              const name = path?.split('/').slice(-3).join('/') ?? '–'
+              return <div key={label}><b>{label}:</b> {name}</div>
+            })}
+            <div style={{ marginTop: 4 }}>
+              <button onClick={togglePause} style={{ fontSize: 11, cursor: 'pointer' }}>
+                {paused ? '▶ resume' : '⏸ pause'}
+              </button>
+            </div>
+          </DebugOverlay>
+        )}
       </Wrapper>
     </>
   )

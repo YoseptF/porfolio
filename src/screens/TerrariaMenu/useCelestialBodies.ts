@@ -12,25 +12,29 @@ export type CelestialBodies = {
   onPointerUp: () => void
 }
 
+// Sun travels from off-screen left (-0.15) to off-screen right (1.15)
+const X_START = -0.15
+const X_RANGE = 1.3
+
 const timeToSunX = (t: number): number => {
   const dayT = Math.min(t / 0.5, 1)
-  return 0.05 + dayT * 0.9
+  return X_START + dayT * X_RANGE
 }
 
 export const arcXToY = (x: number): number => {
-  const normalized = (x - 0.05) / 0.9
+  const normalized = (x - X_START) / X_RANGE
   const heightFactor = 1 - Math.pow((normalized - 0.5) * 2, 2)
-  return 0.40 - 0.32 * heightFactor
+  return 0.40 - 0.18 * heightFactor
 }
 
-// time 0.5→1.0 maps to x: 0.05→0.95 (left→right, same direction as sun)
+// Moon mirrors sun: off-screen left → off-screen right during night (t 0.5→1.0)
 export const timeToMoonX = (t: number): number =>
-  0.05 + ((t - 0.5) / 0.5) * 0.9
+  X_START + ((t - 0.5) / 0.5) * X_RANGE
 
-// Both sun (day) and moon (night) travel left→right, so the inverse is the same formula offset by 0.5
+// Inverse: screen x position → cycle time
 export const sunXToT = (x: number, phase: 'day' | 'night'): number => {
   const base = phase === 'day' ? 0 : 0.5
-  return base + (x - 0.05) / 0.9 * 0.5
+  return base + (x - X_START) / X_RANGE * 0.5
 }
 
 const RETURN_DURATION_MS = 1200
@@ -75,7 +79,7 @@ export const useCelestialBodies = (
   // Empty deps — reads isDraggingRef synchronously instead of stale state closure
   const onPointerMove = useCallback((e: React.PointerEvent) => {
     if (!isDraggingRef.current) return
-    const x = Math.max(0.05, Math.min(0.95, e.clientX / window.innerWidth))
+    const x = Math.max(0, Math.min(1, e.clientX / window.innerWidth))
     const y = Math.max(0.02, Math.min(0.55, e.clientY / window.innerHeight))
     overrideXRef.current = x
     overrideYRef.current = y

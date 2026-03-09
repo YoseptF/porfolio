@@ -23,6 +23,7 @@ const Layer = styled.div<LayerProps>`
   will-change: background-position-x;
   filter: brightness(${({ $brightness }) => $brightness});
   z-index: ${({ $zIndex }) => $zIndex};
+  pointer-events: none;
 `
 
 type Props = {

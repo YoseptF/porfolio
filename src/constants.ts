@@ -1,8 +1,47 @@
 export const EXPERIENCE = new Date().getFullYear() - 2019 + "+";
 
+export const DAY_CYCLE_MS = 60 * 1000; // 1 real minute = 1 full day/night cycle
+
 // Terraria background parallax layers: far=0, mid=1, near=2
-export const BG_LAYER_HEIGHTS = ["950px", "750px", "640px"] as const;
+export const BG_LAYER_HEIGHTS = [
+  "clamp(250px, 76vh, 950px)",
+  "clamp(200px, 52vh, 750px)",
+  "clamp(180px, 44vh, 640px)",
+] as const;
 export const BG_LAYER_Y_POS = ["bottom", "bottom", "bottom"] as const;
+
+// Lighting stops — t=0.06 is when sun crosses left screen edge, t=0.44 is right screen edge.
+// Outside those bounds the sun is off-screen → treat as near-night.
+// Each stop: [time 0–1, value]
+export const SCENE_LIGHT_STOPS: [number, string][] = [
+  [0,    '#000a28'], // sun off-screen left → night blue
+  [0.06, '#ff8c3c'], // sun enters screen → warm dawn orange
+  [0.25, '#000000'], // noon → no tint (black used at 0 alpha)
+  [0.44, '#c8501e'], // sun leaving screen → warm dusk
+  [0.5,  '#000a28'], // sun off-screen right → night blue
+  [0.75, '#000a28'], // deep night
+  [1,    '#000a28'],
+]
+
+export const SCENE_LIGHT_ALPHA_STOPS: [number, number][] = [
+  [0,    0.55], // sun off-screen: dark overlay
+  [0.06, 0.35], // dawn: moderate
+  [0.25, 0.00], // noon: no overlay
+  [0.44, 0.40], // dusk: moderate
+  [0.5,  0.55], // sun off-screen: dark overlay
+  [0.75, 0.25], // deep night — moon gives light, lighter overlay
+  [1,    0.55],
+]
+
+export const BRIGHTNESS_STOPS: [number, number][] = [
+  [0,    0.40], // sun off-screen left → dim
+  [0.06, 0.60], // dawn → dim but visible
+  [0.25, 1.10], // noon → peak brightness
+  [0.44, 0.60], // dusk → dim again
+  [0.5,  0.40], // sun off-screen right → dim
+  [0.75, 0.65], // deep night — moon glow
+  [1,    0.40],
+]
 
 export const PROJECTS_URL = "/projects/index.json";
 

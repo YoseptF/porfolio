@@ -12,7 +12,7 @@ const CelestialBodyBase = styled.div<{ $isDragging: boolean }>`
   cursor: ${({ $isDragging }) => ($isDragging ? 'grabbing' : 'grab')};
   touch-action: none;
   user-select: none;
-  z-index: 4;
+  z-index: 1;
 
   @media (max-width: 640px) {
     width: 32px;
@@ -42,7 +42,7 @@ const LightOverlay = styled.div`
   inset: 0;
   pointer-events: none;
   mix-blend-mode: overlay;
-  z-index: 3;
+  z-index: 1;
 `
 
 const HORIZON_Y = 0.40
@@ -54,7 +54,7 @@ const FlareImg = styled.img`
   width: min(400px, 40vw);
   mix-blend-mode: screen;
   pointer-events: none;
-  z-index: 3;
+  z-index: 1;
 `
 
 // Overshoot easing: arrives at target then bounces slightly back before settling
