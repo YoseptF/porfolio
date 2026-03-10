@@ -4,9 +4,6 @@ import { BG_LAYER_HEIGHTS, BG_LAYER_Y_POS } from '../../constants'
 
 type LayerProps = {
   $src: string
-  $offsetX: number
-  $speedFactor: number
-  $brightness: number
   $zIndex: number
   $height: string
   $posY: string
@@ -18,10 +15,8 @@ const Layer = styled.div<LayerProps>`
   background-image: url(${({ $src }) => $src});
   background-size: auto ${({ $height }) => $height};
   background-repeat: repeat-x;
-  background-position-x: ${({ $offsetX, $speedFactor }) => -$offsetX * $speedFactor}px;
   background-position-y: ${({ $posY }) => $posY};
   will-change: background-position-x;
-  filter: brightness(${({ $brightness }) => $brightness});
   z-index: ${({ $zIndex }) => $zIndex};
   pointer-events: none;
 `
@@ -47,16 +42,18 @@ export const ParallaxBackground: FC<Props> = ({
       const totalIdx = layerIndexOffset + i
       const height = BG_LAYER_HEIGHTS[totalIdx] ?? 'auto'
       const posY = BG_LAYER_Y_POS[totalIdx] ?? 'bottom'
+      const speedFactor = (totalIdx + 1) * 0.6
       return (
         <Layer
           key={src}
           $src={src}
-          $offsetX={offsetX}
-          $speedFactor={(totalIdx + 1) * 0.6}
-          $brightness={brightness}
           $zIndex={zIndexStart + i}
           $height={height}
           $posY={posY}
+          style={{
+            backgroundPositionX: `${-offsetX * speedFactor}px`,
+            filter: `brightness(${brightness})`,
+          }}
         />
       )
     })}
