@@ -45,28 +45,4 @@ export const shadows = {
   textShadowMid: "1px 1px 0 rgba(0,0,0,0.5)",
 };
 
-export const pixelatedClipPath = (step = 6): string => {
-  const c = step * 2;
-  return `clip-path: polygon(
-    0 ${c}px,
-    ${step}px ${c}px,
-    ${step}px ${step}px,
-    ${c}px ${step}px,
-    ${c}px 0,
-    calc(100% - ${c}px) 0,
-    calc(100% - ${step}px) 0,
-    calc(100% - ${step}px) ${step}px,
-    100% ${step}px,
-    100% ${c}px,
-    100% calc(100% - ${c}px),
-    100% calc(100% - ${step}px),
-    calc(100% - ${step}px) calc(100% - ${step}px),
-    calc(100% - ${step}px) 100%,
-    calc(100% - ${c}px) 100%,
-    ${c}px 100%,
-    ${step}px 100%,
-    ${step}px calc(100% - ${step}px),
-    0 calc(100% - ${step}px),
-    0 calc(100% - ${c}px)
-  );`;
-};
+export { pixelatedClipPath } from './utils';

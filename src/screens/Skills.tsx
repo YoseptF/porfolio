@@ -1,9 +1,10 @@
 import { type FC } from 'react'
 import styled from 'styled-components'
-import { BalatroText } from '../components/ui/BalatroText'
+import { Text } from '../components/ui/Text'
 import { ModalWrapper } from '../components/ui/ModalWrapper'
-import { useAppDispatch } from '../store/hooks'
-import { closeModal } from '../store/slices/navigation'
+import { ThemedSkillCard } from '../components/ui/ThemedSkillCard'
+import { useAppDispatch, useAppSelector } from '../store/hooks'
+import { closeModal, selectMenuTheme } from '../store/slices/navigation'
 import { skills } from '../data/skills'
 import { theme } from '../styles/theme'
 
@@ -12,7 +13,7 @@ const Header = styled.div`
   margin-bottom: 16px;
 `
 
-const Grid = styled.div`
+const BalatroGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   gap: 10px;
@@ -28,59 +29,36 @@ const Grid = styled.div`
   }
 `
 
-const levelColors: Record<string, string> = {
-  beginner: theme.colors.text.muted,
-  intermediate: theme.colors.text.chips,
-  advanced: theme.colors.text.gold,
-  expert: theme.colors.text.mult,
-}
+const TerrariaGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+  background: rgba(27, 40, 62, 0.95);
+  border: 2px solid #4a6fa8;
+  padding: 16px;
 
-const SkillCard = styled.div<{ $level: string }>`
-  background: rgba(0, 0, 0, 0.3);
-  border: 2px solid ${({ $level }) => levelColors[$level] ?? theme.colors.panel.border};
-  border-radius: ${theme.radii.md};
-  padding: 10px 6px;
-  text-align: center;
-  cursor: default;
-  transition: transform 0.15s, box-shadow 0.15s;
-
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  @media (max-width: 600px) {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
   }
-`
-
-const SkillName = styled.div`
-  font-family: ${theme.font.family};
-  font-size: 0.85rem;
-  color: ${theme.colors.text.white};
-  text-shadow: 1px 1px 0 #000;
-  margin-bottom: 3px;
-`
-
-const SkillLevel = styled.div<{ $level: string }>`
-  font-family: ${theme.font.family};
-  font-size: 0.65rem;
-  color: ${({ $level }) => levelColors[$level] ?? theme.colors.text.muted};
-  text-transform: uppercase;
-  letter-spacing: 1px;
 `
 
 export const Skills: FC = () => {
   const dispatch = useAppDispatch()
+  const menuTheme = useAppSelector(selectMenuTheme)
+
+  const Grid = menuTheme === 'terraria' ? TerrariaGrid : BalatroGrid
 
   return (
     <ModalWrapper maxWidth="550px" onBack={() => dispatch(closeModal())}>
       <Header>
-        <BalatroText variant="heading">COLLECTION</BalatroText>
+        <Text variant="heading">COLLECTION</Text>
       </Header>
 
       <Grid>
         {skills.map((skill) => (
-          <SkillCard key={skill.name} $level={skill.level}>
-            <SkillName>{skill.name}</SkillName>
-            <SkillLevel $level={skill.level}>{skill.level}</SkillLevel>
-          </SkillCard>
+          <ThemedSkillCard key={skill.name} name={skill.name} level={skill.level} />
         ))}
       </Grid>
     </ModalWrapper>

@@ -2,8 +2,8 @@ import { type FC, useState } from 'react'
 import styled from 'styled-components'
 import { useAppDispatch } from '../../store/hooks'
 import { closeModal } from '../../store/slices/navigation'
-import { BalatroButton } from '../../components/ui/BalatroButton'
-import { BalatroPanel } from '../../components/ui/BalatroPanel'
+import { Button } from '../../components/ui/Button'
+import { Panel } from '../../components/ui/Panel'
 import { ModalWrapper } from '../../components/ui/ModalWrapper'
 import { useProjects } from '../../data/useProjects'
 
@@ -30,6 +30,7 @@ const ContentLayout = styled.div`
 const TopButtons = styled.div`
   display: flex;
   gap: 8px;
+  justify-content: center;
 `
 
 const PickerRow = styled.div`
@@ -111,8 +112,13 @@ const TagName = styled.div`
   font-size: 0.9rem;
 `
 
-const NavArrow = styled(BalatroButton)`
-  & button {
+/*
+ * NavArrow overrides: Balatro wraps button in ShadowWrapper (div), so `& button` targets
+ * the inner button. Terraria renders the button directly, so `&:is(button)` targets it.
+ */
+const NavArrow = styled(Button)`
+  & button,
+  &:is(button) {
     height: 72px;
     min-width: 36px;
     padding: 4px 10px;
@@ -146,29 +152,29 @@ export const PlayModal: FC = () => {
 
   return (
     <ModalWrapper maxWidth="min(700px, 95vw)" onBack={() => dispatch(closeModal())}>
-      <BalatroPanel title="Choose your project">
+      <Panel title="Choose your project">
         <ContentLayout>
           <TopButtons>
             {project?.demo ? (
-              <BalatroButton color="green" href={project.demo} target="_blank" rel="noopener noreferrer">
+              <Button color="green" href={project.demo} target="_blank" rel="noopener noreferrer">
                 Live Demo
-              </BalatroButton>
+              </Button>
             ) : (
-              <BalatroButton color="green" disabled>
+              <Button color="green" disabled>
                 Live Demo
-              </BalatroButton>
+              </Button>
             )}
-            <BalatroButton color="grey" disabled>
+            <Button color="grey" disabled>
               Continue
-            </BalatroButton>
+            </Button>
             {project ? (
-              <BalatroButton color="blue" href={project.github} target="_blank" rel="noopener noreferrer">
+              <Button color="blue" href={project.github} target="_blank" rel="noopener noreferrer">
                 GitHub Code
-              </BalatroButton>
+              </Button>
             ) : (
-              <BalatroButton color="blue" disabled>
+              <Button color="blue" disabled>
                 GitHub Code
-              </BalatroButton>
+              </Button>
             )}
           </TopButtons>
 
@@ -210,12 +216,12 @@ export const PlayModal: FC = () => {
           )}
 
           <PlayRow>
-            <BalatroButton color="blue" large>
+            <Button color="blue" large>
               Play
-            </BalatroButton>
+            </Button>
           </PlayRow>
         </ContentLayout>
-      </BalatroPanel>
+      </Panel>
     </ModalWrapper>
   )
 }

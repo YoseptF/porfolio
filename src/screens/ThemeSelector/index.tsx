@@ -3,8 +3,9 @@ import styled from 'styled-components'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { closeModal, setMenuTheme, selectMenuTheme } from '../../store/slices/navigation'
 import { ModalWrapper } from '../../components/ui/ModalWrapper'
-import { BalatroPanel } from '../../components/ui/BalatroPanel'
-import { BalatroText } from '../../components/ui/BalatroText'
+import { Panel } from '../../components/ui/Panel'
+import { Text } from '../../components/ui/Text'
+import { audioPlayer, musicTracks } from '../../services/audioPlayer'
 
 const Grid = styled.div`
   display: grid;
@@ -45,26 +46,32 @@ export const ThemeSelector: FC = () => {
   const dispatch = useAppDispatch()
   const menuTheme = useAppSelector(selectMenuTheme)
 
-  const select = (theme: 'balatro' | 'terraria') => {
-    dispatch(setMenuTheme(theme))
+  const select = (selected: 'balatro' | 'terraria') => {
+    dispatch(setMenuTheme(selected))
     dispatch(closeModal())
+    if (selected === 'terraria') {
+      localStorage.setItem('musicEnabled', 'true')
+      audioPlayer.switchTrack(musicTracks.TERRARIA_TRACK)
+    } else {
+      audioPlayer.switchTrack(musicTracks.BALATRO_TRACK)
+    }
     window.dispatchEvent(new Event('portfolio:theme-changed'))
   }
 
   return (
     <ModalWrapper onBack={() => dispatch(closeModal())} maxWidth="min(600px, 92vw)" fitContent>
-      <BalatroPanel title="MENU STYLE">
+      <Panel title="MENU STYLE">
         <Grid>
           <ThemeCard $active={menuTheme === 'balatro'} onClick={() => select('balatro')}>
             <Preview $theme="balatro" />
-            <BalatroText variant={menuTheme === 'balatro' ? 'gold' : 'body'}>Balatro</BalatroText>
+            <Text variant={menuTheme === 'balatro' ? 'gold' : 'body'}>Balatro</Text>
           </ThemeCard>
           <ThemeCard $active={menuTheme === 'terraria'} onClick={() => select('terraria')}>
             <Preview $theme="terraria" />
-            <BalatroText variant={menuTheme === 'terraria' ? 'gold' : 'body'}>Terraria</BalatroText>
+            <Text variant={menuTheme === 'terraria' ? 'gold' : 'body'}>Terraria</Text>
           </ThemeCard>
         </Grid>
-      </BalatroPanel>
+      </Panel>
     </ModalWrapper>
   )
 }

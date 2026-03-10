@@ -4,8 +4,8 @@ import { Provider } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
 import { navigationReducer } from '../store/slices/navigation'
 
-export const makeStore = () =>
-  configureStore({ reducer: { navigation: navigationReducer } })
+export const makeStore = (preloadedState?: Parameters<typeof configureStore>[0]['preloadedState']) =>
+  configureStore({ reducer: { navigation: navigationReducer }, preloadedState })
 
 export const renderWithStore = (
   ui: ReactNode,

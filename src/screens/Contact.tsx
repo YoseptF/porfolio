@@ -1,9 +1,10 @@
 import { type FC } from 'react'
 import styled from 'styled-components'
-import { BalatroText } from '../components/ui/BalatroText'
-import { BalatroButton } from '../components/ui/BalatroButton'
-import { BalatroPanel } from '../components/ui/BalatroPanel'
+import { Text } from '../components/ui/Text'
+import { Button } from '../components/ui/Button'
+import { Panel } from '../components/ui/Panel'
 import { ModalWrapper } from '../components/ui/ModalWrapper'
+import { ThemedInput, ThemedTextArea } from '../components/ui/ThemedInput'
 import { useAppDispatch } from '../store/hooks'
 import { closeModal } from '../store/slices/navigation'
 import { theme } from '../styles/theme'
@@ -12,48 +13,6 @@ const Form = styled.form`
   display: flex;
   flex-direction: column;
   gap: 12px;
-`
-
-const Input = styled.input`
-  font-family: ${theme.font.family};
-  font-size: 1rem;
-  color: ${theme.colors.text.white};
-  background: rgba(0, 0, 0, 0.4);
-  border: 2px solid ${theme.colors.panel.border};
-  border-radius: ${theme.radii.md};
-  padding: 10px 14px;
-  outline: none;
-  transition: border-color 0.2s;
-
-  &:focus {
-    border-color: ${theme.colors.button.blue};
-  }
-
-  &::placeholder {
-    color: ${theme.colors.text.muted};
-  }
-`
-
-const TextArea = styled.textarea`
-  font-family: ${theme.font.family};
-  font-size: 1rem;
-  color: ${theme.colors.text.white};
-  background: rgba(0, 0, 0, 0.4);
-  border: 2px solid ${theme.colors.panel.border};
-  border-radius: ${theme.radii.md};
-  padding: 10px 14px;
-  min-height: 120px;
-  resize: vertical;
-  outline: none;
-  transition: border-color 0.2s;
-
-  &:focus {
-    border-color: ${theme.colors.button.blue};
-  }
-
-  &::placeholder {
-    color: ${theme.colors.text.muted};
-  }
 `
 
 const SocialRow = styled.div`
@@ -85,33 +44,33 @@ export const Contact: FC = () => {
 
   return (
     <ModalWrapper maxWidth="460px" onBack={() => dispatch(closeModal())}>
-      <BalatroPanel title="CONTACT">
+      <Panel title="CONTACT">
         <Form action="https://formspree.io/xvovpedq" method="POST">
-          <BalatroText variant="body">Send me a message!</BalatroText>
-          <Input
+          <Text variant="body">Send me a message!</Text>
+          <ThemedInput
             name="email"
             type="email"
             placeholder="your@email.com"
             required
             autoComplete="off"
           />
-          <Input
+          <ThemedInput
             name="subject"
             type="text"
             placeholder="Subject"
             required
             autoComplete="off"
           />
-          <TextArea
+          <ThemedTextArea
             name="message"
             placeholder="Your message..."
             required
             autoComplete="off"
           />
           <ButtonRow>
-            <BalatroButton color="green">
+            <Button color="green">
               Send
-            </BalatroButton>
+            </Button>
           </ButtonRow>
         </Form>
 
@@ -123,7 +82,7 @@ export const Contact: FC = () => {
             LinkedIn
           </a>
         </SocialRow>
-      </BalatroPanel>
+      </Panel>
     </ModalWrapper>
   )
 }

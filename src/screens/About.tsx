@@ -1,13 +1,12 @@
-import { type FC } from "react";
-import styled from "styled-components";
-import { BalatroText } from "../components/ui/BalatroText";
-import { BalatroPanel } from "../components/ui/BalatroPanel";
-import { ModalWrapper } from "../components/ui/ModalWrapper";
-import { useAppDispatch } from "../store/hooks";
-import { closeModal } from "../store/slices/navigation";
-import { theme } from "../styles/theme";
-import { EXPERIENCE } from "../constants";
-
+import { type FC } from 'react'
+import styled from 'styled-components'
+import { Text } from '../components/ui/Text'
+import { Panel } from '../components/ui/Panel'
+import { ModalWrapper } from '../components/ui/ModalWrapper'
+import { useAppDispatch } from '../store/hooks'
+import { closeModal } from '../store/slices/navigation'
+import { theme } from '../styles/theme'
+import { EXPERIENCE } from '../constants'
 
 const ProfileSection = styled.div`
   display: flex;
@@ -19,7 +18,7 @@ const ProfileSection = styled.div`
     flex-direction: column;
     text-align: center;
   }
-`;
+`
 
 const ProfileImage = styled.img`
   width: 80px;
@@ -31,7 +30,7 @@ const ProfileImage = styled.img`
     width: 56px;
     height: 56px;
   }
-`;
+`
 
 const Bio = styled.div`
   display: flex;
@@ -47,7 +46,7 @@ const Bio = styled.div`
       display: none;
     }
   }
-`;
+`
 
 const StatsRow = styled.div`
   display: flex;
@@ -59,67 +58,67 @@ const StatsRow = styled.div`
     justify-content: center;
     gap: 8px;
   }
-`;
+`
 
 const StatItem = styled.div`
   text-align: center;
-`;
+`
 
 export const About: FC = () => {
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch()
 
   return (
     <ModalWrapper onBack={() => dispatch(closeModal())} maxWidth="min(900px, 92vw)">
-      <BalatroPanel title="ABOUT">
+      <Panel title="ABOUT">
         <ProfileSection>
           <ProfileImage src="/cards/happy.png" alt="Joseph" />
           <div>
-            <BalatroText variant="heading">Joseph Flores</BalatroText>
+            <Text variant="heading">Joseph Flores</Text>
             <br />
-            <BalatroText variant="gold">Frontend Developer</BalatroText>
+            <Text variant="gold">Frontend Developer</Text>
           </div>
         </ProfileSection>
 
         <Bio>
-          <BalatroText variant="body">
-            I've spent the last {EXPERIENCE} years translating complex ideas
+          <Text variant="body">
+            I&apos;ve spent the last {EXPERIENCE} years translating complex ideas
             into seamless React interfaces. Programming is much more than
-            writing code, it's a medium for expression.
-          </BalatroText>
-          <BalatroText variant="body">
+            writing code, it&apos;s a medium for expression.
+          </Text>
+          <Text variant="body">
             My dual background in digital arts and computer science means I
-            don't just ask how to build something, but why it matters to the
+            don&apos;t just ask how to build something, but why it matters to the
             person on the other side of the screen.
-          </BalatroText>
-          <BalatroText variant="body">
-            Whether leading frontend teams or art collectives, I've learned that
-            the best products aren't built in a vacuum. They're the result of
+          </Text>
+          <Text variant="body">
+            Whether leading frontend teams or art collectives, I&apos;ve learned that
+            the best products aren&apos;t built in a vacuum. They&apos;re the result of
             clear communication and a deep focus on solving real human problems.
-          </BalatroText>
-          <BalatroText variant="body">
+          </Text>
+          <Text variant="body">
             My goal is simple: create digital solutions that are technically
             sound, visually compelling, and work perfectly.
-          </BalatroText>
+          </Text>
         </Bio>
 
         <StatsRow>
           <StatItem>
-            <BalatroText variant="chips">{EXPERIENCE}</BalatroText>
+            <Text variant="chips">{EXPERIENCE}</Text>
             <br />
-            <BalatroText variant="body">Years</BalatroText>
+            <Text variant="body">Years</Text>
           </StatItem>
           <StatItem>
-            <BalatroText variant="mult">∞</BalatroText>
+            <Text variant="mult">∞</Text>
             <br />
-            <BalatroText variant="body">Logo revisions</BalatroText>
+            <Text variant="body">Logo revisions</Text>
           </StatItem>
           <StatItem>
-            <BalatroText variant="gold">100%</BalatroText>
+            <Text variant="gold">100%</Text>
             <br />
-            <BalatroText variant="body">Delivered</BalatroText>
+            <Text variant="body">Delivered</Text>
           </StatItem>
         </StatsRow>
-      </BalatroPanel>
+      </Panel>
     </ModalWrapper>
-  );
-};
+  )
+}
