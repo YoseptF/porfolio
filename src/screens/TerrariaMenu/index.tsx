@@ -51,7 +51,7 @@ const DebugOverlay = styled.div`
 
 const LogoArea = styled.div`
   position: absolute;
-  top: 4%;
+  top: 2%;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
@@ -63,7 +63,7 @@ const LogoArea = styled.div`
 
 const ButtonArea = styled.div`
   position: absolute;
-  top: 28%;
+  top: 32%;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;

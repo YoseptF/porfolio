@@ -15,7 +15,7 @@ const wobble = keyframes`
 
 const Wrapper = styled.div`
   position: relative;
-  max-width: min(480px, 85vw);
+  max-width: clamp(350px, 66vw, 950px);
 `
 
 const LogoImg = styled.img`

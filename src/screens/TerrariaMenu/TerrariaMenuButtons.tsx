@@ -6,17 +6,17 @@ import { openModal } from '../../store/slices/navigation'
 const ButtonList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: clamp(4px, 0.5vw, 8px);
   align-items: center;
 `
 
 const TerrariaBtn = styled.button`
   font-family: 'Andy Bold', sans-serif;
-  font-size: 32px;
+  font-size: clamp(26px, 4.7vw, 68px);
   color: #e8d080;
   background: none;
   border: none;
-  padding: 2px 8px;
+  padding: clamp(2px, 0.3vw, 4px) clamp(6px, 0.8vw, 12px);
   cursor: pointer;
   text-shadow:
     2px 2px 0 #000,

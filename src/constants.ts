@@ -1,6 +1,6 @@
 export const EXPERIENCE = new Date().getFullYear() - 2019 + "+";
 
-export const DAY_CYCLE_MS = 60 * 1000; // 1 real minute = 1 full day/night cycle
+export const DAY_CYCLE_MS = 45 * 1000; // 1 real minute = 1 full day/night cycle
 
 // Terraria background parallax layers: far=0, mid=1, near=2
 export const BG_LAYER_HEIGHTS = [
@@ -14,34 +14,34 @@ export const BG_LAYER_Y_POS = ["bottom", "bottom", "bottom"] as const;
 // Outside those bounds the sun is off-screen → treat as near-night.
 // Each stop: [time 0–1, value]
 export const SCENE_LIGHT_STOPS: [number, string][] = [
-  [0,    '#000a28'], // sun off-screen left → night blue
-  [0.06, '#ff8c3c'], // sun enters screen → warm dawn orange
-  [0.25, '#000000'], // noon → no tint (black used at 0 alpha)
-  [0.44, '#c8501e'], // sun leaving screen → warm dusk
-  [0.5,  '#000a28'], // sun off-screen right → night blue
-  [0.75, '#000a28'], // deep night
-  [1,    '#000a28'],
-]
+  [0, "#000a28"], // sun off-screen left → night blue
+  [0.06, "#ff8c3c"], // sun enters screen → warm dawn orange
+  [0.25, "#000000"], // noon → no tint (black used at 0 alpha)
+  [0.44, "#c8501e"], // sun leaving screen → warm dusk
+  [0.5, "#000a28"], // sun off-screen right → night blue
+  [0.75, "#000a28"], // deep night
+  [1, "#000a28"],
+];
 
 export const SCENE_LIGHT_ALPHA_STOPS: [number, number][] = [
-  [0,    0.55], // sun off-screen: dark overlay
+  [0, 0.55], // sun off-screen: dark overlay
   [0.06, 0.35], // dawn: moderate
-  [0.25, 0.00], // noon: no overlay
-  [0.44, 0.40], // dusk: moderate
-  [0.5,  0.55], // sun off-screen: dark overlay
+  [0.25, 0.0], // noon: no overlay
+  [0.44, 0.4], // dusk: moderate
+  [0.5, 0.55], // sun off-screen: dark overlay
   [0.75, 0.25], // deep night — moon gives light, lighter overlay
-  [1,    0.55],
-]
+  [1, 0.55],
+];
 
 export const BRIGHTNESS_STOPS: [number, number][] = [
-  [0,    0.40], // sun off-screen left → dim
-  [0.06, 0.60], // dawn → dim but visible
-  [0.25, 1.10], // noon → peak brightness
-  [0.44, 0.60], // dusk → dim again
-  [0.5,  0.40], // sun off-screen right → dim
+  [0, 0.4], // sun off-screen left → dim
+  [0.06, 0.6], // dawn → dim but visible
+  [0.25, 1.1], // noon → peak brightness
+  [0.44, 0.6], // dusk → dim again
+  [0.5, 0.4], // sun off-screen right → dim
   [0.75, 0.65], // deep night — moon glow
-  [1,    0.40],
-]
+  [1, 0.4],
+];
 
 export const PROJECTS_URL = "/projects/index.json";
 
