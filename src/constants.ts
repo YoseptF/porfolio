@@ -64,7 +64,7 @@ export const SWIRL_SPEED_VARIANCE = 0.08;
 export const SWIRL_CARD_WIDTH = 1.2;
 export const SWIRL_CARD_HEIGHT = 1.68;
 
-export const TAUNT_CYCLE_MS = 12000;
+export const TAUNT_CYCLE_MS = 9000;
 
 export const DRAG_TAUNTS: { touch: string; mouse: string }[] = [
   {

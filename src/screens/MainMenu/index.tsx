@@ -31,7 +31,8 @@ import { BurnRevealFilter } from "./BurnReveal";
 import { IntroSequence } from "./IntroSequence";
 import { DebugSwirl } from "./DebugSwirl";
 import { slowFilters } from "../../utils/browserCaps";
-import { useTypewriter, type TypewriterState } from "./useTypewriter";
+import { TAUNT_CYCLE_MS } from "../../constants";
+import { useTypewriter } from "./useTypewriter";
 import { useTauntCycle } from "./useTauntCycle";
 import { useMusicBubble } from "./useMusicBubble";
 import { JimboTooltip } from "./JimboTooltip";
@@ -75,17 +76,7 @@ export const MainMenu: FC = () => {
     handleDismissBubble,
   } = useMusicBubble(introActive);
 
-  // typewriterRef breaks the circular dep: useTauntCycle needs typewriter
-  // output to know when typing is done, but useTypewriter needs tooltipText
-  // from useTauntCycle. We pass the previous render's typewriter state.
-  const typewriterRef = useRef<TypewriterState>({ completedWords: [], inProgress: "" });
-
-  const { tauntSeed, tooltipText } = useTauntCycle({
-    completedWords: typewriterRef.current.completedWords,
-    inProgress: typewriterRef.current.inProgress,
-    cardBurnDone,
-    hasDragged,
-  });
+  const { tauntSeed, tooltipText, nextTaunt } = useTauntCycle();
 
   const { completedWords, inProgress } = useTypewriter(
     tooltipText,
@@ -93,8 +84,16 @@ export const MainMenu: FC = () => {
     tauntSeed,
   );
 
-  // Sync current render's typewriter state into the ref for the next render
-  typewriterRef.current = { completedWords, inProgress };
+  const isTypingDone =
+    completedWords.length > 0 &&
+    inProgress === "" &&
+    completedWords.join(" ") === tooltipText;
+
+  useEffect(() => {
+    if (!isTypingDone || hasDragged || !cardBurnDone) return;
+    const id = setTimeout(nextTaunt, TAUNT_CYCLE_MS);
+    return () => clearTimeout(id);
+  }, [isTypingDone, hasDragged, cardBurnDone, nextTaunt]);
 
   useEffect(() => {
     const handler = () => {
