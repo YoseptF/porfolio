@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { pixelatedClipPath } from '../../../styles/utils'
 import type { ButtonColor, ButtonProps } from '../types'
 
-const colorBgMap: Record<ButtonColor, string> = {
+const colorFillMap: Record<ButtonColor, string> = {
   blue: '#2a4a9a',
   orange: '#8a4a12',
   red: '#8a1e1e',
@@ -22,20 +22,26 @@ const colorBorderMap: Record<ButtonColor, string> = {
 }
 
 /*
- * Border via ::before pseudo-element at inset: -2px with the same clip-path.
- * Both share the pixelated polygon so the 2px gap shows the border color.
- * No drop-shadow needed for Terraria style.
+ * Two-layer background creates the border inside a single element:
+ *   layer 1 (top): fill color, inset 2px on all sides
+ *   layer 2 (base): border color filling the full shape
+ * pixelatedClipPath cuts the corners of both layers simultaneously.
  */
 const StyledBtn = styled.button<{ $color: ButtonColor; $large: boolean }>`
   font-family: 'Andy Bold', sans-serif;
   font-size: ${({ $large }) => ($large ? '2.2rem' : '1.4rem')};
   color: #e8d080;
   text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
-  background: ${({ $color }) => colorBgMap[$color]};
+  background:
+    linear-gradient(
+        ${({ $color }) => colorFillMap[$color]},
+        ${({ $color }) => colorFillMap[$color]}
+      )
+      2px 2px / calc(100% - 4px) calc(100% - 4px) no-repeat,
+    ${({ $color }) => colorBorderMap[$color]};
   border: none;
   padding: 10px 24px;
   cursor: pointer;
-  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -43,17 +49,8 @@ const StyledBtn = styled.button<{ $color: ButtonColor; $large: boolean }>`
   outline: none;
   ${pixelatedClipPath(5)}
 
-  &::before {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    background: ${({ $color }) => colorBorderMap[$color]};
-    ${pixelatedClipPath(5)}
-    z-index: -1;
-  }
-
   &:hover {
-    filter: brightness(1.3);
+    filter: brightness(1.25);
     color: #fff8a0;
     text-shadow:
       2px 2px 0 #000,

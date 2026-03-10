@@ -39,7 +39,6 @@ const BackRow = styled.div<{ $maxWidth: string }>`
 
 const FullWidthButton = styled(TerrariaButton)`
   flex: 1;
-  font-size: 2rem;
 `
 
 export const TerrariaModalWrapper: FC<ModalWrapperProps> = ({
@@ -50,7 +49,7 @@ export const TerrariaModalWrapper: FC<ModalWrapperProps> = ({
   <Overlay>
     <ContentBox $maxWidth={maxWidth}>{children}</ContentBox>
     <BackRow $maxWidth={maxWidth}>
-      <FullWidthButton color="blue" onClick={onBack}>
+      <FullWidthButton color="blue" large onClick={onBack}>
         Back
       </FullWidthButton>
     </BackRow>

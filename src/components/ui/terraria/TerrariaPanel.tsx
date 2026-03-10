@@ -5,53 +5,53 @@ import type { PanelProps } from '../types'
 import { TerrariaText } from './TerrariaText'
 
 /*
- * Border via ::before pseudo-element — same pixelated clip-path at inset: -2px.
- * The 2px gap between the two polygons shows the border color.
+ * Two-layer gradient background creates the border in a single element:
+ *   layer 1: fill color, offset 2px inward on all sides
+ *   layer 2: border color, fills the full shape
+ * clip-path cuts both layers simultaneously — no wrapper divs needed.
+ *
+ * TranslucentFrame is the outer ring: same blue but semi-transparent,
+ * so the parallax background shows through at the edges.
  */
-const panelMixin = (step: number) => `
-  background: #1a2a5e;
-  position: relative;
-  ${pixelatedClipPath(step)}
-
-  &::before {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    background: #4a6aaa;
-    ${pixelatedClipPath(step)}
-    z-index: -1;
-  }
-`
 
 const TitleBadge = styled.div`
-  ${panelMixin(5)}
+  background:
+    linear-gradient(#1a2a5e, #1a2a5e) 2px 2px / calc(100% - 4px) calc(100% - 4px) no-repeat,
+    #5a7aaa;
   align-self: center;
   padding: 6px 24px;
   margin-bottom: -2px;
   z-index: 1;
+  ${pixelatedClipPath(5)}
 `
 
 const PanelBox = styled.div`
-  ${panelMixin(6)}
-  padding: 24px 16px 16px;
+  background:
+    linear-gradient(#1a2a5e, #1a2a5e) 2px 2px / calc(100% - 4px) calc(100% - 4px) no-repeat,
+    #5a7aaa;
   flex: 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  padding: 22px 14px 16px;
+  ${pixelatedClipPath(6)}
 `
 
-const Wrapper = styled.div`
+const TranslucentFrame = styled.div`
+  background: rgba(40, 70, 180, 0.4);
+  padding: 6px;
   display: flex;
   flex-direction: column;
+  ${pixelatedClipPath(8)}
 `
 
 export const TerrariaPanel: FC<PanelProps> = ({ title, children, className }) => (
-  <Wrapper className={className}>
+  <TranslucentFrame className={className}>
     {title && (
       <TitleBadge>
         <TerrariaText variant="heading">{title}</TerrariaText>
       </TitleBadge>
     )}
     <PanelBox>{children}</PanelBox>
-  </Wrapper>
+  </TranslucentFrame>
 )
